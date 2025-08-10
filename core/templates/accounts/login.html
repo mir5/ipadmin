@@ -1,145 +1,160 @@
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="en" data-pc-preset="preset-1" data-pc-sidebar-caption="true" data-pc-direction="ltr" dir="ltr" data-pc-theme="light">
+  <!-- [Head] start -->
+
+  <head>
+    <title>Login | Datta Able Dashboard Template</title>
+    <!-- [Meta] -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="description"
+      content="Datta Able is trending dashboard template made using Bootstrap 5 design framework. Datta Able is available in Bootstrap, React, CodeIgniter, Angular,  and .net Technologies."
+    />
+    <meta
+      name="keywords"
+      content="Bootstrap admin template, Dashboard UI Kit, Dashboard Template, Backend Panel, react dashboard, angular dashboard"
+    />
+    <meta name="author" content="CodedThemes" />
+
+    <!-- [Favicon] icon -->
+    <link rel="icon" href="{% static 'images/favicon.svg' %}" type="image/x-icon" />
+  <!-- [Font] Family -->
+ <!-- <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" /> -->
+<!-- [phosphor Icons] https://phosphoricons.com/ -->
+<link rel="stylesheet" href="{% static 'fonts/phosphor/duotone/style.css' %}" />
+<!-- [Tabler Icons] https://tablericons.com -->
+<link rel="stylesheet" href="{% static 'fonts/tabler-icons.min.css' %}" />
+<!-- [Feather Icons] https://feathericons.com -->
+<link rel="stylesheet" href="{% static 'fonts/feather.css' %}" />
+<!-- [Font Awesome Icons] https://fontawesome.com/icons -->
+<link rel="stylesheet" href="{% static 'fonts/fontawesome.css' %}" />
+<!-- [Material Icons] https://fonts.google.com/icons -->
+<link rel="stylesheet" href="{% static 'fonts/material.css' %}" />
+<!-- [Template CSS Files] -->
+<link rel="stylesheet" href="{% static 'css/style.css' %}" id="main-style-link" />
+<link rel="stylesheet" href="{% static 'vendor/toastify/toastify.css' %}">
+
+  </head>
+  <!-- [Head] end -->
+  <!-- [Body] Start -->
+
+  <body>
+    <!-- [ Pre-loader ] start -->
+    <div class="loader-bg fixed inset-0 bg-white dark:bg-themedark-cardbg z-[1034]">
+      <div class="loader-track h-[5px] w-full inline-block absolute overflow-hidden top-0">
+        <div class="loader-fill w-[300px] h-[5px] bg-primary-500 absolute top-0 left-0 animate-[hitZak_0.6s_ease-in-out_infinite_alternate]"></div>
+      </div>
+    </div>
+    <!-- [ Pre-loader ] End -->
+
+    <div class="auth-main relative">
+      <div class="auth-wrapper v1 flex items-center w-full h-full min-h-screen">
+        <div class="auth-form flex items-center justify-center grow flex-col min-h-screen relative p-6 ">
+          <div class="w-full max-w-[350px] relative">
+            <div class="auth-bg ">
+              <span class="absolute top-[-100px] right-[-100px] w-[300px] h-[300px] block rounded-full bg-theme-bg-1 animate-[floating_7s_infinite]"></span>
+              <span class="absolute top-[150px] right-[-150px] w-5 h-5 block rounded-full bg-primary-500 animate-[floating_9s_infinite]"></span>
+              <span class="absolute left-[-150px] bottom-[150px] w-5 h-5 block rounded-full bg-theme-bg-1 animate-[floating_7s_infinite]"></span>
+              <span class="absolute left-[-100px] bottom-[-100px] w-[300px] h-[300px] block rounded-full bg-theme-bg-2 animate-[floating_9s_infinite]"></span>
+            </div>
+            <div class="card sm:my-12  w-full shadow-none">
+              <div class="card-body !p-10">
+                <div class="text-center mb-8">
+                  <a href="#"><img src="{% static 'images/logo-dark.svg'%}" alt="img" class="mx-auto auth-logo"/></a>
+                </div>
+                <h4 class="text-center font-medium mb-4">Login</h4>
+                <form method="post" action="{% url 'accounts:login' %}"  >
+                   {% csrf_token %}
+
+                <div class="mb-3">
+                  <input type="email" name="username"  class="form-control" id="floatingInput" placeholder="Email Address" />
+                </div>
+                <div class="mb-4">
+                  <input type="password" name="password" id="password" class="form-control" id="floatingInput1" placeholder="Password" />
+                </div>
+                <div class="flex mt-1 justify-between items-center flex-wrap">
+                  <div class="form-check">
+                    <input class="form-check-input input-primary" type="checkbox" id="customCheckc1" checked="" />
+                    <label class="form-check-label text-muted" for="customCheckc1">Remember me?</label>
+                  </div>
+
+
+
+
+
+
+                  
+                 
+                  <h6 class="font-normal text-primary-500 mb-0">
+                    <a href="#"> Forgot Password? </a>
+                  </h6>
+                </div>
+                <div class="mt-4 text-center">
+                  <button type="submit" class="btn btn-primary mx-auto shadow-2xl">Login</button>
+                </div>
+                 </form>
+                <div class="flex justify-between items-end flex-wrap mt-4">
+                  <h6 class="font-medium mb-0">Don't have an Account?</h6>
+                  <a href="register-v1.html" class="text-primary-500">Create Account</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+    <!-- [ Main Content ] end -->
+    <!-- Required Js -->
+    <script src="{% static 'js/plugins/simplebar.min.js' %}"></script>
+    <script src="{% static 'js/plugins/popper.min.js'%}"></script>
+    <script src="{% static 'js/icon/custom-icon.js'%}"></script>
+    <script src="{% static 'js/plugins/feather.min.js'%}"></script>
+    <script src="{% static 'js/component.js'%}"></script>
+    <script src="{% static 'js/theme.js'%}"></script>
+    <script src="{% static 'js/script.js'%}"></script>
+
+     <!-- JS Toastify -->
+    <script src="{% static 'vendor/toastify/toastify.js' %}"></script>
+
+    <div class="floting-button fixed bottom-[50px] right-[30px] z-[1030]">
+    </div>
+
     
-
-<!-- Mirrored from rtl-temp.ir/Theme/Zinzer/vertical-rtl/pages-login.html by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 11 Jun 2019 05:46:51 GMT -->
-<head>
-        <meta charset="utf-8" />
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
-        <title>زینزر - داشبورد ادمین بوت استرپ 4</title>
-        <meta content="Admin Dashboard" name="description" />
-        <meta content="ThemeDesign" name="author" />
-        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-
-        <link rel="shortcut icon" href="{%  static 'assets/images/favicon.ico' %} ">
-
-        <link href="{% static 'assets/css/bootstrap.min.css'%}" rel="stylesheet" type="text/css">
-        <link href="{% static 'assets/css/icons.css'%}" rel="stylesheet" type="text/css">
-        <link href="{% static 'assets/css/style.css' %}" rel="stylesheet" type="text/css">
-
-    </head>
-
-
-    <body class="fixed-left">
-
-        <!-- Loader -->
-        <div id="preloader">
-            <div id="status">
-                <div class="spinner">
-                    <div class="rect1"></div>
-                    <div class="rect2"></div>
-                    <div class="rect3"></div>
-                    <div class="rect4"></div>
-                    <div class="rect5"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Begin page -->
-        <div class="home-btn d-none d-sm-block">
-            <a href="{% url 'index'%}" class="text-dark"><i class="mdi mdi-home h1"></i></a>
-        </div>
-
-        <div class="account-pages">
-            
-            <div class="container">
-                <div class="row align-items-center">
-                    <div class="col-lg-6 offset-lg-1">
-                        <div class="text-left">
-                            <div>
-                                <a href="{% url 'index' %}" class="logo logo-admin"><img src="{%  static 'assets/images/logo_dark.png' %}" height="28" alt="logo"></a>
-                            </div>
-                            <h5 class="font-14 text-muted mb-4">زینزر - داشبورد ادمین بوت استرپ 4 ریسپانسیو</h5>
-                            <p class="text-muted mb-4">یک قالب مدیریتی حرفه ای برای انواع ادمین هایی که میخواهد شرکت و یا تجارت و مشتریان خود  را اداره کنند.</p>
-
-                            <h5 class="font-14 text-muted mb-4">مقررات :</h5>
-                            <div>
-                                <p><i class="mdi mdi-arrow-right text-primary mr-2"></i>ستفاده از طراحان گرافیک است..</p>
-                                <p><i class="mdi mdi-arrow-right text-primary mr-2"></i>لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با ا.</p>
-                                <p><i class="mdi mdi-arrow-right text-primary mr-2"></i>لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با ا .</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-5">
-                        <div class="card mb-0">
-                            <div class="card-body">
-                                <div class="p-2">
-                                    <h4 class="text-muted float-right font-18 mt-4">ورود</h4>
-                                    <div>
-                                        <a href="index-2.html" class="logo logo-admin"><img src="{%  static 'assets/images/logo_dark.png' %}" height="28" alt="logo"></a>
-                                    </div>
-                                </div>
-        
-                                <div class="p-2">
-                                    <form class="form-horizontal m-t-20" action="https://themesdesign.in/zinzer_1/vertical-rtl/index.html">
-        
-                                        <div class="form-group row">
-                                            <div class="col-12">
-                                                <input class="form-control" type="text" required="" placeholder="نام کاربری">
-                                            </div>
-                                        </div>
-        
-                                        <div class="form-group row">
-                                            <div class="col-12">
-                                                <input class="form-control" type="password" required="" placeholder="رمز عبور">
-                                            </div>
-                                        </div>
-        
-                                        <div class="form-group row">
-                                            <div class="col-12">
-                                                <div class="custom-control custom-checkbox">
-                                                    <input type="checkbox" class="custom-control-input" id="customCheck1">
-                                                    <label class="custom-control-label" for="customCheck1">مرا به خاطر داشته باش</label>
-                                                </div>
-                                            </div>
-                                        </div>
-        
-                                        <div class="form-group text-center row m-t-20">
-                                            <div class="col-12">
-                                                <button class="btn btn-primary btn-block waves-effect waves-light" type="submit">ورود</button>
-                                            </div>
-                                        </div>
-        
-                                        <div class="form-group m-t-10 mb-0 row">
-                                            <div class="col-sm-7 m-t-20">
-                                                <a href="pages-recoverpw.html" class="text-muted"><i class="mdi mdi-lock"></i> فراموشی رمز عبور؟</a>
-                                            </div>
-                                            <div class="col-sm-5 m-t-20">
-                                                <a href="pages-register.html" class="text-muted"><i class="mdi mdi-account-circle"></i> ایجاد حساب جدید</a>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </div>
-        
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- end row -->
-            </div>
-        </div>
-
-
-
-        <!-- jQuery  -->
-        <script src="{%  static 'assets/js/jquery.min.js' %}"></script>
-        <script src="{%  static 'assets/js/bootstrap.bundle.min.js' %}"></script>
-        <script src="{%  static 'assets/js/modernizr.min.js' %}"></script>
-        <script src="{%  static 'assets/js/detect.js' %}"></script>
-        <script src="{%  static 'assets/js/fastclick.js' %}"></script>
-        <script src="{%  static 'assets/js/jquery.slimscroll.js' %}"></script>
-        <script src="{%  static 'assets/js/jquery.blockUI.js' %}"></script>
-        <script src="{%  static 'assets/js/waves.js' %}"></script>
-        <script src="{%  static 'assets/js/jquery.nicescroll.js' %}"></script>
-        <script src="{%  static 'assets/js/jquery.scrollTo.min.js' %}"></script>
-
-        <!-- App js -->
-        <script src="{%  static 'assets/js/app.js' %}"></script>
-
-    </body>
-
-
-<!-- Mirrored from rtl-temp.ir/Theme/Zinzer/vertical-rtl/pages-login.html by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 11 Jun 2019 05:46:51 GMT -->
+    <script>
+      layout_change('false');
+    </script>
+     
+    
+    <script>
+      layout_theme_sidebar_change('dark');
+    </script>
+    
+     
+    <script>
+      change_box_container('false');
+    </script>
+     
+    <script>
+      layout_caption_change('true');
+    </script>
+     
+    <script>
+      layout_rtl_change('false');
+    </script>
+     
+    <script>
+      preset_change('preset-1');
+    </script>
+     
+    <script>
+      main_layout_change('vertical');
+    </script>
+    {% include 'messages.html' %}
+ 
+  </body>
+  <!-- [Body] end -->
 </html>

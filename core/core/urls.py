@@ -18,9 +18,12 @@ from django.contrib import admin
 from django.urls import path,include
 from django.conf import settings
 from django.conf.urls.static import static
-
+from django.contrib.auth import views as auth_views
+from accounts import views
+app_name='core'
 urlpatterns = [
-    path('/', include('django.contrib.auth.urls'),name="index"),  # Default auth URLs
+    path('', views.LoginView.as_view(), name='index'),
+
     path('admin/', admin.site.urls),
     path('accounts/',include('accounts.urls')),
     path('ipm/',include('ipm.urls')),

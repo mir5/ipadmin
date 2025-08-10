@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_jalali',
+  
 
     'accounts',
     'ipm',
@@ -142,6 +142,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 AUTH_USER_MODEL = 'accounts.User'
-LOGIN_URL = '/accounts/login/'
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/admin'
 LOGOUT_REDIRECT_URL='/'
+LOGIN_URL = 'account:login'
