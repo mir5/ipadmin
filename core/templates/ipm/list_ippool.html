@@ -4,7 +4,7 @@ ip_pool_list.html{% extends 'base.html' %}
 <div class="container">
     <h2>🗂️ IP Pool List</h2>
 
-    <a href="{% url 'ip_pool_create' %}" class="btn btn-primary mb-3">➕ Add New IP Pool</a>
+    <a href="{% url 'ipm:newippool' %}" class="btn btn-primary mb-3">➕ Add New IP Pool</a>
 
     {% if ip_pools %}
         <table class="table table-bordered table-striped">
@@ -33,16 +33,20 @@ ip_pool_list.html{% extends 'base.html' %}
                     <td>{{ pool.is_active|yesno:"✅,❌" }}</td>
                     <td>{{ pool.created_at|date:"Y-m-d H:i" }}</td>
                     <td>
-                        <a href="{% url 'ip_pool_detail' pool.id %}" class="btn btn-sm btn-info">View</a>
+                        {% comment %} <a href="{% url 'ip_pool_detail' pool.id %}" class="btn btn-sm btn-info">View</a>
                         <a href="{% url 'ip_pool_update' pool.id %}" class="btn btn-sm btn-warning">Edit</a>
-                        <a href="{% url 'ip_pool_delete' pool.id %}" class="btn btn-sm btn-danger">Delete</a>
+                        <a href="{% url 'ip_pool_delete' pool.id %}" class="btn btn-sm btn-danger">Delete</a> {% endcomment %}
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     {% else %}
-        <p class="alert alert-info">No IP pools found. Start by <a href="{% url 'ip_pool_create' %}">adding one</a>.</p>
+        <p class="alert alert-info">No IP pools found. Start by <a href="{% url 'ipm:newippool' %}">adding one</a>.</p>
     {% endif %}
+
+
+
+    
 </div>
 {% endblock %}

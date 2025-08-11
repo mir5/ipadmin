@@ -15,20 +15,47 @@
         <div class="row">
           <div class="col-md-6">
             <div class="mb-3">
-              <label class="form-label">Start IP</label>
-              {{ form.ip_range_start|add_class:"form-control" }}
+              <label class="form-label">VLAN</label>
+              {{ form.vlan|add_class:"form-select" }}
             </div>
+            <div class="mb-3">
+    <label class="form-label">Start IP</label>
+    {{ form.ip_range_start|add_class:"form-control" }}
+
+    {% if form.ip_range_start.errors %}
+        <label class="validatelabel">
+            {{ form.ip_range_start.errors.0 }}
+        </label>
+    {% endif %}
+</div>
             <div class="mb-3">
               <label class="form-label">End IP</label>
               {{ form.ip_range_end|add_class:"form-control" }}
+              
+    {% if form.ip_range_end.errors %}
+        <label class="validatelabel">
+            {{ form.ip_range_start.errors.0 }}
+        </label>
+    {% endif %}
+              
             </div>
             <div class="mb-3">
               <label class="form-label">Subnet Mask</label>
               {{ form.subnet_mask|add_class:"form-control" }}
+              {% if form.subnet_mask.errors %}
+                  <label class="validatelabel">
+                      {{ form.subnet_mask.errors.0 }}
+                  </label>
+              {% endif %}
             </div>
             <div class="mb-3">
               <label class="form-label">Gateway</label>
               {{ form.gateway|add_class:"form-control" }}
+              {% if form.gateway.errors %}
+                  <label class="validatelabel">
+                      {{ form.gateway.errors.0 }}
+                  </label>
+              {% endif %}
             </div>
           </div>
 
@@ -38,17 +65,20 @@
               {{ form.dns_servers|add_class:"form-control" }}
             </div>
             <div class="mb-3">
-              <label class="form-label">Description</label>
-              {{ form.description|add_class:"form-control" }}
-            </div>
+    <label class="form-label">Description</label>
+    {{ form.description|add_class:"form-control" }}
+
+    {% if form.description.errors %}
+        <label class="validatelabel" for="floatingInputInvalid1">
+            {{ form.description.errors.0 }}
+        </label>
+    {% endif %}
+</div>
             <div class="mb-3 form-check">
               {{ form.is_active }}
               <label class="form-check-label">Is Active</label>
             </div>
-            <div class="mb-3">
-              <label class="form-label">VLAN</label>
-              {{ form.vlan|add_class:"form-select" }}
-            </div>
+            
           </div>
         </div>
         <button type="submit" class="btn btn-primary mt-3">Submit</button>

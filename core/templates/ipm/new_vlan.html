@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load form_tags %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-header">
+      <h4>Create New Vlan</h4>
+    </div>
+
+    <div class="card-body">
+      <form method="post" novalidate>
+        {% csrf_token %}
+
+        {# Non-field errors (from form.clean) #}
+        {% if form.non_field_errors %}
+          {% for error in form.non_field_errors %}
+            <div class="validatelabel">{{ error }}</div>
+          {% endfor %}
+        {% endif %}
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label">VLAN Name</label>
+              {{ form.name|add_class:"form-control" }}
+              {% if form.name.errors %}
+                <label class="validatelabel">{{ form.name.errors.0 }}</label>
+              {% endif %}
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">VLAN Number</label>
+              {{ form.vlan_id|add_class:"form-control" }}
+              {% if form.vlan_id.errors %}
+                <label class="validatelabel">{{ form.vlan_id.errors.0 }}</label>
+              {% endif %}
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Category</label>
+              {{ form.category|add_class:"form-select" }}
+              {% if form.category.errors %}
+                <label class="validatelabel">{{ form.category.errors.0 }}</label>
+              {% endif %}
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">VPN Name</label>
+              {{ form.vpn_name|add_class:"form-control" }}
+              {% if form.vpn_name.errors %}
+                <label class="validatelabel">{{ form.vpn_name.errors.0 }}</label>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label">Description</label>
+              {{ form.description|add_class:"form-control" }}
+              {% if form.description.errors %}
+                <label class="validatelabel">{{ form.description.errors.0 }}</label>
+              {% endif %}
+            </div>
+
+            <div class="mb-3 form-check">
+              {{ form.is_visible_to_users }}
+              <label class="form-check-label" for="{{ form.is_visible_to_users.id_for_label }}">
+                Visible to Users
+              </label>
+              {% if form.is_visible_to_users.errors %}
+                <div class="validatelabel">{{ form.is_visible_to_users.errors.0 }}</div>
+              {% endif %}
+            </div>
+
+            <div class="mb-3 form-check">
+              {{ form.status }}
+              <label class="form-check-label" for="{{ form.status.id_for_label }}">
+                Status
+              </label>
+              {% if form.status.errors %}
+                <div class="validatelabel">{{ form.status.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">Submit</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
