@@ -1,0 +1,48 @@
+ip_pool_list.html{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>🗂️ IP Pool List</h2>
+
+    <a href="{% url 'ip_pool_create' %}" class="btn btn-primary mb-3">➕ Add New IP Pool</a>
+
+    {% if ip_pools %}
+        <table class="table table-bordered table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th>VLAN</th>
+                    <th>Start IP</th>
+                    <th>End IP</th>
+                    <th>Subnet Mask</th>
+                    <th>Gateway</th>
+                    <th>DNS Servers</th>
+                    <th>Active</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pool in ip_pools %}
+                <tr>
+                    <td>{{ pool.vlan.name }}</td>
+                    <td>{{ pool.ip_range_start }}</td>
+                    <td>{{ pool.ip_range_end }}</td>
+                    <td>{{ pool.subnet_mask }}</td>
+                    <td>{{ pool.gateway }}</td>
+                    <td>{{ pool.dns_servers }}</td>
+                    <td>{{ pool.is_active|yesno:"✅,❌" }}</td>
+                    <td>{{ pool.created_at|date:"Y-m-d H:i" }}</td>
+                    <td>
+                        <a href="{% url 'ip_pool_detail' pool.id %}" class="btn btn-sm btn-info">View</a>
+                        <a href="{% url 'ip_pool_update' pool.id %}" class="btn btn-sm btn-warning">Edit</a>
+                        <a href="{% url 'ip_pool_delete' pool.id %}" class="btn btn-sm btn-danger">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="alert alert-info">No IP pools found. Start by <a href="{% url 'ip_pool_create' %}">adding one</a>.</p>
+    {% endif %}
+</div>
+{% endblock %}

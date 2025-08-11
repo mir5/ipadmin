@@ -19,15 +19,16 @@ from django.urls import path,include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
-from accounts import views
+from dashboard import views
 app_name='core'
 urlpatterns = [
-    path('', views.LoginView.as_view(), name='index'),
+    path('', views.IndexView.as_view(), name='index'),
 
     path('admin/', admin.site.urls),
     path('accounts/',include('accounts.urls')),
     path('ipm/',include('ipm.urls')),
     path('requestflow/',include('requestflow.urls')),
+    path('dashboard/', include('dashboard.urls')),
     
 ]
 

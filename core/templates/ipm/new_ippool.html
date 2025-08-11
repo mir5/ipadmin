@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% load form_tags %}
+{% block content %}
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-header">
+     
+      <h4> Create New IP Pool</h4>
+    </div>
+    <div class="card-body">
+      <form method="post">
+        {% csrf_token %}
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label">Start IP</label>
+              {{ form.ip_range_start|add_class:"form-control" }}
+            </div>
+            <div class="mb-3">
+              <label class="form-label">End IP</label>
+              {{ form.ip_range_end|add_class:"form-control" }}
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Subnet Mask</label>
+              {{ form.subnet_mask|add_class:"form-control" }}
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Gateway</label>
+              {{ form.gateway|add_class:"form-control" }}
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="form-label">DNS Servers</label>
+              {{ form.dns_servers|add_class:"form-control" }}
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Description</label>
+              {{ form.description|add_class:"form-control" }}
+            </div>
+            <div class="mb-3 form-check">
+              {{ form.is_active }}
+              <label class="form-check-label">Is Active</label>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">VLAN</label>
+              {{ form.vlan|add_class:"form-select" }}
+            </div>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Submit</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
