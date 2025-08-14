@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h4>Request #{{ request.id }} – {{ request.user.email }}</h4>
+  <p><strong>Status:</strong> {{ request.get_status_display }}</p>
+  <p><strong>VLAN:</strong> {{ request.vlan.name }}</p>
+  <p><strong>Reason:</strong> {{ request.reason }}</p>
+  <p><strong>Duration:</strong> {{ request.duration_days }} days</p>
+  <p><strong>Admin Comment:</strong> {{ request.admin_comment }}</p>
+
+  {% if request.status == 'approved' %}
+    <h5 class="mt-4">Assigned IPs</h5>
+    {% if request.assigned_ips.all %}
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>IP Address</th>
+            <th>Monitored</th>
+            <th>Assigned By Admin</th>
+            <th>Created</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ip in request.assigned_ips.all %}
+          <tr>
+            <td>{{ ip.ip_address }}</td>
+            <td>{% if ip.is_monitored %}✅{% else %}❌{% endif %}</td>
+            <td>{% if ip.assigned_by_admin %}✅{% else %}❌{% endif %}</td>
+            <td>{{ ip.created_at|date:"Y-m-d H:i" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>No IPs assigned yet.</p>
+    {% endif %}
+  {% else %}
+    <p>This request has not been approved yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% load form_tags %}
+{% block content %}
+<div class="container mt-4">
+ <div class="card">
+    <div class="card-header">
+        <h4>Admin: IP Requests</h4>
+    </div>
+
+    <div class="card-body">
+  <!-- Filter Dropdown -->
+  <form method="get" class="mb-3">
+    <label for="status" class="form-label">Filter by Status:</label>
+    <select name="status" id="status" class="form-select" onchange="this.form.submit()">
+      {% for code, label in status_choices %}
+        <option value="{{ code }}" {% if code == status_filter %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </form>
+
+  <!-- Requests Table -->
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>User</th>
+        <th>VLAN</th>
+        <th>Status</th>
+        <th>Data </th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for req in requests %}
+      <tr>
+        <td>{{ req.id }}</td>
+        <td>{{ req.user.email }}</td>
+        <td>{{ req.vlan.name }}</td>
+        <td>{{ req.get_status_display }}</td>
+        
+           <td>
+      {% with req.assigned_ips.all as ips %}
+        {% if ips %}
+          {{ ips|length }} IPs<br>
+          {{ ips.first.ip_address }} → {{ ips.last.ip_address }}
+        {% else %}
+          —
+        {% endif %}
+      {% endwith %}
+    </td>
+
+        <td>
+          {% if req.status == 'pending' %}
+            <a href="{% url 'requestflow:admin_review' req.id %}" class="btn btn-sm btn-warning">Review</a>
+          {% endif %}
+          <a href="{% url 'requestflow:request_detail' req.id %}" class="btn btn-sm btn-info">IP List</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="5">No requests found.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- Pagination -->
+  {% if is_paginated %}
+  <nav>
+    <ul class="pagination">
+      {% if page_obj.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?status={{ status_filter }}&page={{ page_obj.previous_page_number }}">Previous</a>
+        </li>
+      {% endif %}
+      {% for num in paginator.page_range %}
+        <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+          <a class="page-link" href="?status={{ status_filter }}&page={{ num }}">{{ num }}</a>
+        </li>
+      {% endfor %}
+      {% if page_obj.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?status={{ status_filter }}&page={{ page_obj.next_page_number }}">Next</a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+  {% endif %}
+</div>
+</div>
+{% endblock %}

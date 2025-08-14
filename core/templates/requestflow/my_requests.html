@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <div class="container mt-4">
+ <div class="card">
+    <div class="card-header">
+      <h4>Admin: IP Requests</h4>
+         <a href="{% url 'ipm:newippool' %}" class="btn btn-primary mb-3">➕ New Request</a>
+    </div>
+
+  
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        
+        <th>VLAN</th>
+        <th>ip_count</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for req in requests %}
+      <tr>
+        <td>{{ req.id }}</td>
+        
+        <td>{{ req.vlan.name }}</td>
+        <td>{{ req.ip_count }}</td>
+       <td>
+            {% if req.status == 'pending' %}
+              <span class="badge bg-warning text-dark">Pending</span>
+            {% elif req.status == 'approved' %}
+              <span class="badge bg-success">Approved</span>
+            {% elif req.status == 'rejected' %}
+              <span class="badge bg-danger">Rejected</span>
+            {% else %}
+              <span class="badge bg-secondary">{{ req.get_status_display }}</span>
+            {% endif %}
+      </td>
+      <td>
+          <a href="{% url 'requestflow:request_detail' req.id %}" class="btn btn-sm btn-info">IP List</a>
+
+          {% if req.get_status_display == 'Pending' %}
+            <a href="{% url 'requestflow:cancel_request' req.id %}" class="btn btn-sm btn-outline-danger ms-1">Cancel</a>
+          {% endif %}
+</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  
+ <div class="card-footer text-center">
+    
+ </div>
+</div>
+
+</div>
+
+</div>
+{% endblock %}

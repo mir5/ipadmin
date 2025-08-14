@@ -3,65 +3,103 @@
 
 {% block content %}
 <div class="container mt-4">
-  <div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-      <h4>VLAN List</h4>
-      <a href="{% url 'ipm:newvlan' %}" class="btn btn-primary btn-sm">+ Add VLAN</a>
-    </div>
-    <div class="card-body">
-      {% if vlans %}
-      <div class="table-responsive">
-        <table class="table table-bordered table-hover align-middle">
-          <thead class="table-light">
-            <tr>
-              <th>#</th>
-              <th>VLAN Name</th>
-              <th>VLAN Number</th>
-              <th>Category</th>
-              <th>VPN Name</th>
-              <th>Visible to Users</th>
-              <th>Status</th>
-              <th>Created</th>
-              <th>Updated</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for vlan in vlans %}
-            <tr>
-              <td>{{ forloop.counter }}</td>
-              <td>{{ vlan.name }}</td>
-              <td>{{ vlan.vlan_id }}</td>
-              <td>{{ vlan.get_category_display }}</td>
-              <td>{{ vlan.vpn_name }}</td>
-              <td>
-                {% if vlan.is_visible_to_users %}
-                  ✅
-                {% else %}
-                  ❌
-                {% endif %}
-              </td>
-              <td>
-                {% if vlan.status %}
-                  Active
-                {% else %}
-                  Inactive
-                {% endif %}
-              </td>
-              <td>{{ vlan.created_at|date:"Y-m-d H:i" }}</td>
-              <td>{{ vlan.updated_at|date:"Y-m-d H:i" }}</td>
-              <td>
-                {% comment %} <a href="{% url 'edit_vlan' vlan.pk %}" class="btn btn-sm btn-warning">Edit</a>
-                <a href="{% url 'delete_vlan' vlan.pk %}" class="btn btn-sm btn-danger">Delete</a> {% endcomment %}
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+  <div class="row">
+    <!-- VLAN Table Section -->
+    <div class="mt-5">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h4>VLAN List</h4>
+          <a href="{% url 'ipm:newvlan' %}" class="btn btn-primary btn-sm">+ Add VLAN</a>
+        </div>
+        <div class="card-body">
+          {% if vlans %}
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>#</th>
+                  <th>VLAN Name</th>
+                  <th>VLAN Number</th>
+                  <th>Category</th>
+                  <th>VPN Name</th>
+                  <th>Visible to Users</th>
+                  <th>Status</th>
+                  <th>Created</th>
+                  <th>Updated</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for vlan in vlans %}
+                <tr>
+                  <td>{{ vlan.id }}</td>
+                  <td>{{ vlan.name }}</td>
+                  <td>{{ vlan.vlan_id }}</td>
+                  <td>{{ vlan.get_category_display }}</td>
+                  <td>{{ vlan.vpn_name }}</td>
+                  <td>{% if vlan.is_visible_to_users %}✅{% else %}❌{% endif %}</td>
+                  <td>{% if vlan.status %}Active{% else %}Inactive{% endif %}</td>
+                  <td>{{ vlan.created_at|date:"Y-m-d H:i" }}</td>
+                  <td>{{ vlan.updated_at|date:"Y-m-d H:i" }}</td>
+                  <td>
+                    <a href="{% url 'ipm:edit_vlan' vlan.pk %}" class="btn btn-sm btn-warning">Edit</a>
+                    <a href="{% url 'ipm:delete_vlan' vlan.pk %}" class="btn btn-sm btn-danger">Delete</a>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <p>No VLANs found.</p>
+          {% endif %}
+        </div>
+        <div class="card-footer text-center">
+          <div class="pagination">
+            <span class="step-links">
+              {% if page_obj.has_previous %}
+                <a href="?page=1">&laquo; first</a>
+                <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+              {% endif %}
+              <span class="current">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.</span>
+              {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">next</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+              {% endif %}
+            </span>
+          </div>
+        </div>
       </div>
-      {% else %}
-      <p>No VLANs found.</p>
-      {% endif %}
+    </div>
+
+    <!-- Filter Box Section -->
+    <div class="mt-3">
+      <div class="card">
+        <div class="card-header">
+          <h5>🔍 Filter VLANs</h5>
+        </div>
+        <div class="card-body">
+          <form method="get">
+            <div class="mb-3">
+              <label for="vlan_name" class="form-label">VLAN Name</label>
+              <input type="text" name="vlan_name" id="vlan_name" class="form-control" value="{{ request.GET.vlan_name }}">
+            </div>
+            <div class="mb-3">
+              <label for="vpn_name" class="form-label">VPN Name</label>
+              <input type="text" name="vpn_name" id="vpn_name" class="form-control" value="{{ request.GET.vpn_name }}">
+            </div>
+            <div class="mb-3">
+              <label for="status" class="form-label">Status</label>
+              <select name="status" id="status" class="form-select">
+                <option value="">-- All --</option>
+                <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Active</option>
+                <option value="inactive" {% if request.GET.status == 'inactive' %}selected{% endif %}>Inactive</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-outline-primary w-100">Apply Filters</button>
+          </form>
+        </div>
+      </div>
     </div>
   </div>
 </div>

@@ -6,6 +6,8 @@ from accounts.models import User
 from ipm.models import VlanModel,IPPoolModel
 from django.core.exceptions import ValidationError
 import ipaddress
+from django.db import transaction
+
 
 
 
@@ -13,13 +15,15 @@ import ipaddress
 
 class IPRequest(models.Model):
     STATUS_CHOICES = [
-        ('pending', 'در انتظار بررسی'),
-        ('approved', 'تایید شده'),
-        ('rejected', 'رد شده'),
+        ('pending', 'In progress'),
+        ('approved', ' Approved '),
+        ('rejected', 'Rejected'),
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     vlan = models.ForeignKey(VlanModel, on_delete=models.CASCADE)
+    
+
     ip_count = models.PositiveIntegerField()
     reason = models.TextField()
     duration_days = models.PositiveIntegerField()
@@ -43,15 +47,17 @@ class IPRequest(models.Model):
 
         vlan = self.selected_ippool.vlan
 
-        # Get all assigned IPs in this VLAN
+
         existing_ips = set(
-            AssignedIP.objects.filter(pool__vlan=vlan)
-            .values_list('ip_address', flat=True)
-        )
+              AssignedIP.objects.filter(ip_request__selected_ippool__vlan=vlan)
+             .values_list('ip_address', flat=True)
+            )
+
+
 
         # Generate IP range from pool
-        start_ip = ip_address(self.selected_ippool.start_ip)
-        end_ip = ip_address(self.selected_ippool.end_ip)
+        start_ip = ipaddress.ip_address(self.selected_ippool.ip_range_start)
+        end_ip = ipaddress.ip_address(self.selected_ippool.ip_range_end)
 
         available_ips = []
         current_ip = start_ip

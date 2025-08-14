@@ -97,7 +97,7 @@
           </a>
         </li>
         <li class="pc-item pc-hasmenu">
-          <a href="../elements/icon-feather.html" class="pc-link">
+          <a href="#" class="pc-link">
             <span class="pc-micon"> <i data-feather="file-text"></i></span>
             <span class="pc-mtext">Managment</span>
           </a>
@@ -109,13 +109,19 @@
           <i data-feather="sidebar"></i>
         </li>
         <li class="pc-item pc-hasmenu">
-          <a href="../pages/login-v1.html" class="pc-link" target="_blank">
+          <a href="{% url 'requestflow:new_request'%}" class="pc-link" >
             <span class="pc-micon"> <i data-feather="archive"></i></span>
-            <span class="pc-mtext">User Reqeust</span>
+            <span class="pc-mtext">New Reqeust</span>
           </a>
         </li>
         <li class="pc-item pc-hasmenu">
-          <a href="../pages/register-v1.html" class="pc-link" target="_blank">
+          <a href="{% url 'requestflow:my_requests'%}" class="pc-link" >
+            <span class="pc-micon"> <i data-feather="archive"></i></span>
+            <span class="pc-mtext">My Reqeust</span>
+          </a>
+        </li>
+        <li class="pc-item pc-hasmenu">
+          <a href="{% url 'requestflow:admin_requests' %}" class="pc-link" >
             <span class="pc-micon"> <i data-feather="clipboard"></i></span>
             <span class="pc-mtext">Request Managment</span>
           </a>
@@ -127,13 +133,13 @@
           <i data-feather="monitor"></i>
         </li>
         <li class="pc-item pc-hasmenu">
-          <a href="../pages/login-v1.html" class="pc-link" target="_blank">
+          <a href="../pages/login-v1.html" class="pc-link" >
             <span class="pc-micon"> <i data-feather="user"></i></span>
             <span class="pc-mtext">User List</span>
           </a>
         </li>
         <li class="pc-item pc-hasmenu">
-          <a href="../pages/register-v1.html" class="pc-link" target="_blank">
+          <a href="../pages/register-v1.html" class="pc-link" >
             <span class="pc-micon"> <i data-feather="user-plus"></i></span>
             <span class="pc-mtext">New User</span>
           </a>
@@ -410,12 +416,12 @@
         <div class="grid grid-cols-12 gap-1.5">
           <div class="col-span-12 sm:col-span-6 my-1">
             <p class="m-0"></p>
-              <a href="https://codedthemes.com/" class="text-theme-bodycolor dark:text-themedark-bodycolor hover:text-primary-500 dark:hover:text-primary-500" target="_blank">CodedThemes</a>
+              <a href="https://codedthemes.com/" class="text-theme-bodycolor dark:text-themedark-bodycolor hover:text-primary-500 dark:hover:text-primary-500" >CodedThemes</a>
               , Built with ♥ for a smoother web presence.
             </p>
           </div>
           <div class="col-span-12 sm:col-span-6 my-1 justify-self-end">
-                   <p class="inline-block max-sm:mr-3 sm:ml-2">Distributed by <a href="https://themewagon.com" target="_blank">Themewagon</a></p>
+                   <p class="inline-block max-sm:mr-3 sm:ml-2">Distributed by <a href="https://themewagon.com" >Themewagon</a></p>
           </div>
         </div>
       </div>

@@ -6,14 +6,13 @@
 <div class="container mt-4">
   <div class="card">
     <div class="card-header">
-      <h4>Create New Vlan</h4>
+      <h4>Edit VLAN</h4>
     </div>
 
     <div class="card-body">
       <form method="post" novalidate>
         {% csrf_token %}
 
-        {# Non-field errors (from form.clean) #}
         {% if form.non_field_errors %}
           {% for error in form.non_field_errors %}
             <div class="validatelabel">{{ error }}</div>
@@ -58,7 +57,7 @@
           <div class="col-md-6">
             <div class="mb-3">
               <label class="form-label">Description</label>
-              {{ form.description|add_class:"form-control" }}
+              {{ form.description |add_class:"form-control" }}
               {% if form.description.errors %}
                 <label class="validatelabel">{{ form.description.errors.0 }}</label>
               {% endif %}
@@ -86,10 +85,10 @@
           </div>
         </div>
 
-        <button type="submit" class="btn btn-primary mt-3">Submit</button>
+        <button type="submit" class="btn btn-success mt-3">Save Changes</button>
+        <a href="{% url 'ipm:listvlan' %}" class="btn btn-secondary mt-3 ms-2">Cancel</a>
       </form>
     </div>
   </div>
-  
 </div>
 {% endblock %}
