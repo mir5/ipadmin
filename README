@@ -1,0 +1,34 @@
+# 🛠️ Ipadmin
+
+**Ipadmin** is a Django-based web application designed to manage IP address pools, VLANs, and IP request workflows in a structured and user-friendly way. Built for network administrators and IT teams, it streamlines IP allocation, tracking, and approval processes with a sleek admin interface.
+
+## 🚀 Features
+
+- 🔐 Role-based access control for users and admins  
+- 🗂️ IP Pool management with pagination and filtering  
+- 🌐 VLAN creation, editing, and visibility toggles  
+- 📥 IP request submission and approval workflow  
+- 📊 Dashboard-style UI with Bootstrap styling  
+- 🧭 Search and filter by status, VPN name, and VLAN name  
+- 📅 Timestamps for tracking creation and updates  
+- 🧹 Clean, modular codebase for easy customization  
+
+## 📦 Tech Stack
+
+- **Backend**: Django 4.x  
+- **Frontend**: Bootstrap 5, HTML5  
+- **Database**: PostgreSQL (or SQLite for dev)  
+- **Auth**: Django's built-in authentication system  
+
+## 🧑‍💻 Getting Started
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/yourusername/ipadmin.git
+cd ipadmin
+
+
+* Create Enviroment:
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
