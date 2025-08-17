@@ -1,8 +1,12 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.exceptions import ValidationError
+from requestflow.models import AssignedIP
+from decimal import Decimal, ROUND_HALF_UP
 
 import ipaddress
+
+
 
 CATEGORY_CHOICES = [
     (1, 'Private'),
@@ -38,6 +42,7 @@ class VlanModel(models.Model):
     verbose_name="Category"
     )
 
+    
 
 
     # VPN range or identifier used for segmentation
@@ -84,6 +89,31 @@ class IPPoolModel(models.Model):
 
     # Active status
     is_active = models.BooleanField(default=True, verbose_name="Is Active")
+
+
+    @property
+    def assigned_ip_count(self):
+        return AssignedIP.objects.filter(ip_request__selected_ippool=self).count()
+
+    @property
+    def total_ip_count(self):
+        try:
+            start_ip = ipaddress.IPv4Address(self.ip_range_start)
+            end_ip = ipaddress.IPv4Address(self.ip_range_end)
+            return int(end_ip) - int(start_ip) + 1
+        except ipaddress.AddressValueError:
+            return 0
+
+    @property
+    def usage_percentage(self):
+        total = self.total_ip_count
+        assigned = self.assigned_ip_count
+        if total == 0:
+            return Decimal('0.00')
+        percentage = (Decimal(assigned) / Decimal(total)) * Decimal('100')
+        return percentage.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+
+
 
     # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)

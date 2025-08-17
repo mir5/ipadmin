@@ -3,7 +3,7 @@ from django.db import models
 # Create your models here.
 from django.db import models
 from accounts.models import User
-from ipm.models import VlanModel,IPPoolModel
+
 from django.core.exceptions import ValidationError
 import ipaddress
 from django.db import transaction
@@ -21,7 +21,7 @@ class IPRequest(models.Model):
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    vlan = models.ForeignKey(VlanModel, on_delete=models.CASCADE)
+    vlan = models.ForeignKey('ipm.VlanModel', on_delete=models.CASCADE)
     
 
     ip_count = models.PositiveIntegerField()
@@ -34,7 +34,11 @@ class IPRequest(models.Model):
         related_name='requests', verbose_name="Selected IP Pool"
     )
 
+
     created_at = models.DateTimeField(auto_now_add=True)
+
+   
+
 
     def __str__(self):
         return f"Request #{self.id} by {self.user.email}"

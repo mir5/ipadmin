@@ -64,6 +64,8 @@ class MyRequestListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         return IPRequest.objects.filter(user=self.request.user).order_by('-created_at')
 
+
+
 class AdminRequestListView(UserPassesTestMixin, ListView):
     model = IPRequest
     template_name = 'requestflow/admin_requests.html'

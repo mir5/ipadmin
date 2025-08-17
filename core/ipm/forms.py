@@ -70,6 +70,12 @@ class IPPoolForm(forms.ModelForm):
     class Meta:
         model = IPPoolModel
         fields = '__all__'
+    def __init__(self, *args, **kwargs):
+        super(IPPoolForm, self).__init__(*args, **kwargs)
+        # Filter VLANs to only those with status=True
+        self.fields['vlan'].queryset = VlanModel.objects.filter(status=True)
+
+
 
     def clean(self):
         cleaned_data = super().clean()

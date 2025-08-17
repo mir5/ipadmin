@@ -1,7 +1,7 @@
 from django.urls import path,include
 from . import views
 from .views import EditVlanView, DeleteVlanView
-from .views import EditIPPoolView, DeleteIPPoolView
+from .views import EditIPPoolView, DeleteIPPoolView,DetailIPpoolView
 
 
 app_name = "ipm"
@@ -16,6 +16,7 @@ urlpatterns = [
     path('ippool/list/', views.IppoolListView.as_view(), name='ippoollist'),
     path('ippool/<int:pk>/edit/', EditIPPoolView.as_view(), name='edit_ippool'),
     path('ippool/<int:pk>/delete/', DeleteIPPoolView.as_view(), name='delete_ippool'),
+    path('ippool/<int:pk>/detail',DetailIPpoolView.as_view(),name="detail_of_pool"),
 
 
 

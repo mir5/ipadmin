@@ -1,76 +1,177 @@
-{% extends 'base.html' %}
+
+
+
+
+
+ {% extends 'base.html' %}
 {% load static %}
 
 {% block content %}
-<div class="container mt-4">
-  <div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-      <h2>🗂️ IP Pool List</h2>
-      <a href="{% url 'ipm:newippool' %}" class="btn btn-primary">➕ Add New IP Pool</a>
-    </div>
 
-    <div class="card-body">
-      {% if page_obj %}
-        <table class="table table-bordered table-striped">
-          <thead class="thead-dark">
-            <tr>
-              <th>VLAN</th>
-              <th>Start IP</th>
-              <th>End IP</th>
-              <th>Subnet Mask</th>
-              <th>Gateway</th>
-              <th>DNS Servers</th>
-              <th>Active</th>
-              <th>Created</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for pool in page_obj %}
-            <tr>
-              <td>{{ pool.vlan.name }}</td>
-              <td>{{ pool.ip_range_start }}</td>
-              <td>{{ pool.ip_range_end }}</td>
-              <td>{{ pool.subnet_mask }}</td>
-              <td>{{ pool.gateway }}</td>
-              <td>{{ pool.dns_servers }}</td>
-              <td>{{ pool.is_active|yesno:"✅,❌" }}</td>
-              <td>{{ pool.created_at|date:"Y-m-d H:i" }}</td>
-              <td>
-                <a href="#" class="btn btn-sm btn-info">View</a>
-                <a href="{% url 'ipm:edit_ippool' pool.id %}" class="btn btn-sm btn-warning">Edit</a>
-                <a href="{% url 'ipm:delete_ippool' pool.id %}" class="btn btn-sm btn-danger">Delete</a>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      {% else %}
-        <p class="alert alert-info">No IP pools found. Start by <a href="{% url 'ipm:newippool' %}">adding one</a>.</p>
-      {% endif %}
-    </div>
 
-    <!-- ✅ Pagination block inside card-footer -->
-     <div class="card-footer text-center">
-      
-      <div class="pagination">
-    <span class="step-links">
-        {% if page_obj.has_previous %}
-            <a href="?page=1">&laquo; first</a>
-            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
-        {% endif %}
 
-        <span class="current">
-            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
-        </span>
+<div class="grid grid-cols-12 gap-x-6">
 
-        {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}">next</a>
-            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
-        {% endif %}
-    </span>
+        <div class="col-span-12 xl:col-span-8 md:col-span-6">
+
+            
+
+
+          <div class="row">
+            <!-- VLAN Table Section -->
+            <div class="mt-5">
+              <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                  <h4>🗂️ IP Pool List</h4>
+                  <br/>
+                  <a href="{% url 'ipm:newippool' %}" class="btn btn-primary">➕ Add New IP Pool</a>
+                </div>
+                <div class="card-body">
+                  {% if page_obj %}
+                <div class="table-responsive">
+                  <table class="table table-hover">
+                    <tbody>
+
+
+                            {% comment %} <td>{{ pool.vlan.name }}</td>
+                    <td>{{ pool.ip_range_start }}</td>
+                    <td>{{ pool.ip_range_end }}</td>
+                    <td>{{ pool.subnet_mask }}</td>
+                    <td>{{ pool.gateway }}</td>
+                    <td>{{ pool.dns_servers }}</td>
+                    <td>{{ pool.is_active|yesno:"✅,❌" }}</td>
+                    <td>{{ pool.created_at|date:"Y-m-d H:i" }}</td>
+                    <td>
+                      <a href="#" class="btn btn-sm btn-info">View</a>
+                      <a href="{% url 'ipm:edit_ippool' pool.id %}" class="btn btn-sm btn-warning">Edit</a>
+                      <a href="{% url 'ipm:delete_ippool' pool.id %}" class="btn btn-sm btn-danger">Delete</a>
+                      </td> {% endcomment %}
+                      {% for pool in page_obj %}
+
+
+
+                      <tr class="unread {% if not vlan.status %}gray-row{% endif %}"" >
+                       
+                        <td>
+                          <h6 class="mb-1">{{ pool.vlan.id }}</h6>
+                          <p class="m-0">{{ pool.vlan.name }}</p>
+                        </td>
+
+                        <td>
+                             
+                          <h6>{{ pool.ip_range_start }}</h6>
+                          <h6>{{ pool.ip_range_end }}</h6>
+                        </td>
+
+                        <td>
+                              <h6>{{ pool.subnet_mask }}</h6>
+                              <h6>{{ pool.gateway }}</h6>
+                              <h6>{{ pool.dns_servers }}</h6>
+
+                        </td>
+
+                        <td>
+                          <h6>Number Of IP: {{ pool.total_ip_count }} </h6>
+                          <h6>Number oF usage: {{ pool.assigned_ip_count }} </h6>
+                          <h6>Prcent of usage {{ pool.usage_percentage }} % </h6>
+
+                        </td>
+
+
+                         {% comment %} <td>
+                             
+                          <h6> 
+                             {{ vlan.status }}
+                          </h6>
+                        </td> {% endcomment %}
+
+{% comment %} 
+                        <td>
+                          <h6 class="text-muted">
+                            <i class="fas fa-circle text-success text-[10px] ltr:mr-4 rtl:ml-4"></i>
+                            status: {{ vlan.status }}
+                            <br/>
+                             <i class="fas fa-circle text-success text-[10px] ltr:mr-4 rtl:ml-4"></i>
+                             user visibility: {{ vlan.is_visible_to_users}}
+                          </h6>
+                        </td> {% endcomment %}
+
+
+
+                        <td>
+                          <a href="{% url 'ipm:detail_of_pool' pool.id %}" class="btn btn-sm btn-success">Detail</a>
+                          <a href="{% url 'ipm:edit_ippool' pool.id %}" class="btn btn-sm btn-warning">Edit</a>
+                          <a href="{% url 'ipm:delete_ippool' pool.id %}" class="btn btn-sm btn-danger">Delete</a>
+                        </td>
+                      </tr>
+                      {%endfor%}
+                     
+                    </tbody>
+                  </table>
+                </div>
+
+                  
+                 
+                  {% else %}
+                  <p>No VLANs found.</p>
+                  {% endif %}
+                </div>
+                <div class="card-footer text-center">
+                  <div class="pagination">
+                    <span class="step-links">
+                      {% if page_obj.has_previous %}
+                        <a href="?page=1">&laquo; first</a>
+                        <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+                      {% endif %}
+                      <span class="current">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.</span>
+                      {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}">next</a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+                      {% endif %}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Filter Box Section -->
+           
+          </div>
+        </div>
+
+        <div class="col-span-12 xl:col-span-4" >
+         <div class="mt-3">
+              <div class="card">
+                <div class="card-header">
+                    <h5>🔍 Filter VLANs</h5>
+                </div>
+                <div class="card-body">
+                  <form method="get">
+                    <div class="mb-3">
+                      <label for="vlan_name" class="form-label">VLAN Name</label>
+                      <input type="text" name="vlan_name" id="vlan_name" class="form-control" value="{{ request.GET.vlan_name }}">
+                    </div>
+                    <div class="mb-3">
+                      <label for="vpn_name" class="form-label">VPN Name</label>
+                      <input type="text" name="vpn_name" id="vpn_name" class="form-control" value="{{ request.GET.vpn_name }}">
+                    </div>
+                    <div class="mb-3">
+                      <label for="status" class="form-label">Status</label>
+                      <select name="status" id="status" class="form-select">
+                        <option value="">-- All --</option>
+                        <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Active</option>
+                        <option value="inactive" {% if request.GET.status == 'inactive' %}selected{% endif %}>Inactive</option>
+                      </select>
+                    </div>
+                    <button type="submit" class="btn btn-outline-primary w-100">Apply Filters</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
 </div>
-      </div>
-  </div>
-</div>
+
+
+
+
 {% endblock %}
