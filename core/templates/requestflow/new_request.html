@@ -6,7 +6,7 @@
 <div class="container mt-4">
  <div class="card">
     <div class="card-header">
-      <h4>Submit New IP Request</h4>
+      <h4>{{ page_title|default:"Submit New IP Request" }}</h4>
     </div>
 
     <div class="card-body">
@@ -16,7 +16,7 @@
                  {{ form.as_p }}
                  <br/>
                  <br/>
-                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="submit" class="btn btn-primary">{{ submit_label|default:"Submit" }}</button>
             </form>
     </div>
 </div>

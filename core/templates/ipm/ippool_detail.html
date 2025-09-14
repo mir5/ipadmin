@@ -21,17 +21,18 @@
                     
                   <a href="#"> {{ pool }}  </a>
                      ({{ pool.vlan.name}}_ {{pool.vlan.vlan_id}}) </h4>
-                  <strong>Usage: {{ pool.usage_percentage }}%</strong>
+                  <strong>Usage: {{ pool.usage_percentage }}% — Assigned: {{ pool.assigned_ip_count }} / {{ pool.total_ip_count }}</strong>
                   <br/>
                   {% comment %} <a href="{% url 'ipm:newvlan' %}" class="btn btn-primary btn-sm">+ Add VLAN</a> {% endcomment %}
                 </div>
                 <div class="card-body">
+                  <h5 class="mb-3">Assigned IPs ({{ pool.assigned_ip_count }})</h5>
                   {% if assigned_ips %}
                 <div class="table-responsive">
                   <table class="table table-hover">
                     <tbody>
                      {% for ip in assigned_ips %}
-                      <tr class="unread {% if not vlan.status %}gray-row{% endif %}"" >
+                      <tr class="unread {% if not pool.vlan.status %}gray-row{% endif %}">
                        
                         <td>
                           <h6 class="mb-1">{{ ip.ip_address}}</h6>
@@ -40,9 +41,7 @@
 
                         <td>
                              
-                          <h6> 
-                             {{ vlan.get_category_display }}
-                          </h6>
+                          <h6>{{ pool.vlan.get_category_display }}</h6>
                         </td>
                         
 
@@ -60,10 +59,10 @@
                         <td>
                           <h6 class="text-muted">
                             <i class="fas fa-circle text-success text-[10px] ltr:mr-4 rtl:ml-4"></i>
-                            status: {{ vlan.status }}
+                            status: {{ pool.vlan.status }}
                             <br/>
                              <i class="fas fa-circle text-success text-[10px] ltr:mr-4 rtl:ml-4"></i>
-                             user visibility: {{ vlan.is_visible_to_users}}
+                             user visibility: {{ pool.vlan.is_visible_to_users}}
                           </h6>
                         </td>
 

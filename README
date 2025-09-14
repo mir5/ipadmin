@@ -32,3 +32,22 @@ cd ipadmin
 * Create Enviroment:
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+## Two-Factor (Google Authenticator)
+Install:
+    pip install django-two-factor-auth django-otp qrcode[pil]
+
+Settings added:
+    INSTALLED_APPS += ['django_otp','django_otp.plugins.otp_totp','django_otp.plugins.otp_static','two_factor']
+    MIDDLEWARE += ['django_otp.middleware.OTPMiddleware']
+    AUTHENTICATION_BACKENDS = ['accounts.backends.EmailBackend','django.contrib.auth.backends.ModelBackend']
+    LOGIN_URL = 'two_factor:login'
+    TWO_FACTOR_FORCE_OTP_ADMIN = True
+
+URLs:
+    Included at project root to provide /account/login/, /account/setup/ etc.
+
+Usage:
+    - Log in at /account/login/
+    - Go to /account/two_factor/setup/ to enroll a device (QR code in Google Authenticator).
+    - Admin site will enforce OTP if enabled.

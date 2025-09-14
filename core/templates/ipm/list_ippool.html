@@ -50,7 +50,7 @@
 
 
 
-                      <tr class="unread {% if not vlan.status %}gray-row{% endif %}"" >
+                      <tr class="unread {% if not pool.vlan.status %}gray-row{% endif %}">
                        
                         <td>
                           <h6 class="mb-1">{{ pool.vlan.id }}</h6>
@@ -79,22 +79,20 @@
 
 
                          {% comment %} <td>
-                             
-                          <h6> 
-                             {{ vlan.status }}
-                          </h6>
+                          <h6>{{ pool.vlan.status }}</h6>
                         </td> {% endcomment %}
 
-{% comment %} 
+{% comment %}
                         <td>
                           <h6 class="text-muted">
                             <i class="fas fa-circle text-success text-[10px] ltr:mr-4 rtl:ml-4"></i>
-                            status: {{ vlan.status }}
+                            status: {{ pool.vlan.status }}
                             <br/>
                              <i class="fas fa-circle text-success text-[10px] ltr:mr-4 rtl:ml-4"></i>
-                             user visibility: {{ vlan.is_visible_to_users}}
+                             user visibility: {{ pool.vlan.is_visible_to_users}}
                           </h6>
-                        </td> {% endcomment %}
+                        </td>
+{% endcomment %}
 
 
 

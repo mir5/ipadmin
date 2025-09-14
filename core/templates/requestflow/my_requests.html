@@ -3,9 +3,27 @@
 <div class="container mt-4">
   <div class="container mt-4">
  <div class="card">
-    <div class="card-header">
-      <h4>Admin: IP Requests</h4>
-         <a href="{% url 'ipm:newippool' %}" class="btn btn-primary mb-3">➕ New Request</a>
+    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <h4 class="m-0">My IP Requests</h4>
+      <a href="{% url 'requestflow:new_request' %}" class="btn btn-primary">➕ New Request</a>
+    </div>
+    <div class="card-body">
+      <div class="mb-3">
+        <div class="btn-group" role="group" aria-label="Filter by status">
+          <a href="?{% if q %}q={{ q }}&{% endif %}" class="btn {% if not status_filter %}btn-primary{% else %}btn-outline-primary{% endif %}">All</a>
+          {% for b in status_buttons %}
+            <a href="?status={{ b.code }}{% if q %}&q={{ q }}{% endif %}" class="btn {% if b.code == status_filter %}btn-primary{% else %}btn-outline-primary{% endif %}">
+              {{ b.label }} ({{ b.count }})
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+
+      <form method="get" class="d-flex gap-2 mb-3">
+        <input type="text" name="q" value="{{ q }}" placeholder="Search requests..." class="form-control" />
+        {% if status_filter %}<input type="hidden" name="status" value="{{ status_filter }}" />{% endif %}
+        <button type="submit" class="btn btn-outline-primary">Search</button>
+      </form>
     </div>
 
   
@@ -22,7 +40,11 @@
     </thead>
     <tbody>
       {% for req in requests %}
-      <tr>
+      <tr class="
+        {% if req.status == 'approved' %}table-success
+        {% elif req.status == 'rejected' %}table-danger
+        {% elif req.status == 'pending' %}table-warning
+        {% endif %}">
         <td>{{ req.id }}</td>
         
         <td>{{ req.vlan.name }}</td>
@@ -39,20 +61,18 @@
             {% endif %}
       </td>
       <td>
-          <a href="{% url 'requestflow:request_detail' req.id %}" class="btn btn-sm btn-info">IP List</a>
+          <a href="{% url 'requestflow:request_detail' req.id %}"
+             class="btn btn-sm {% if req.status == 'approved' %}btn-info{% else %}btn-secondary disabled{% endif %}"
+             {% if req.status != 'approved' %}aria-disabled="true" tabindex="-1"{% endif %}
+            >IP List</a>
 
-          {% if req.get_status_display == 'Pending' %}
-            <a href="{% url 'requestflow:cancel_request' req.id %}" class="btn btn-sm btn-outline-danger ms-1">Cancel</a>
-          {% endif %}
-</td>
+          {# Optional cancel action could go here once implemented #}
+      </td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
-  
- <div class="card-footer text-center">
-    
- </div>
+  <div class="card-footer text-center"></div>
 </div>
 
 </div>

@@ -10,15 +10,17 @@
     </div>
 
     <div class="card-body">
-  <!-- Filter Dropdown -->
-  <form method="get" class="mb-3">
-    <label for="status" class="form-label">Filter by Status:</label>
-    <select name="status" id="status" class="form-select" onchange="this.form.submit()">
-      {% for code, label in status_choices %}
-        <option value="{{ code }}" {% if code == status_filter %}selected{% endif %}>{{ label }}</option>
+  <!-- Filter Buttons -->
+  <div class="mb-3">
+    <label class="form-label d-block">Filter by Status:</label>
+    <div class="btn-group" role="group" aria-label="Filter by status">
+      {% for b in status_buttons %}
+        <a href="?status={{ b.code }}" class="btn {% if b.code == status_filter %}btn-primary{% else %}btn-outline-primary{% endif %}">
+          {{ b.label }} ({{ b.count }})
+        </a>
       {% endfor %}
-    </select>
-  </form>
+    </div>
+  </div>
 
   <!-- Requests Table -->
   <table class="table table-bordered">

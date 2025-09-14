@@ -22,6 +22,7 @@ from django.contrib.auth import views as auth_views
 from dashboard import views
 app_name='core'
 urlpatterns = [
+    # Two-factor URLs can be enabled later if needed
     path('', views.IndexView.as_view(), name='index'),
 
     path('admin/', admin.site.urls),
@@ -29,6 +30,7 @@ urlpatterns = [
     path('ipm/',include('ipm.urls')),
     path('requestflow/',include('requestflow.urls')),
     path('dashboard/', include('dashboard.urls')),
+
     
 ]
 

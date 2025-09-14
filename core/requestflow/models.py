@@ -7,6 +7,8 @@ from accounts.models import User
 from django.core.exceptions import ValidationError
 import ipaddress
 from django.db import transaction
+from django.utils import timezone
+from datetime import timedelta
 
 
 
@@ -42,6 +44,21 @@ class IPRequest(models.Model):
 
     def __str__(self):
         return f"Request #{self.id} by {self.user.email}"
+
+    @property
+    def end_date(self):
+        try:
+            return (self.created_at + timedelta(days=int(self.duration_days)))
+        except Exception:
+            return self.created_at
+
+    @property
+    def days_remaining(self):
+        """Number of whole days remaining until end_date; never negative."""
+        today = timezone.now().date()
+        end_date = self.end_date.date()
+        remaining = (end_date - today).days
+        return remaining if remaining > 0 else 0
  
     def assign_ips(self):
         if self.status != 'approved':
@@ -125,4 +142,3 @@ class AssignedIP(models.Model):
         assigned_count = AssignedIP.objects.filter(ip_request=self.ip_request).exclude(pk=self.pk).count()
         if assigned_count + 1 > self.ip_request.ip_count:
             raise ValidationError(f"Cannot assign more than {self.ip_request.ip_count} IPs for this request.")
-

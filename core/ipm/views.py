@@ -5,13 +5,15 @@ from .models import IPPoolModel, VlanModel
 from .forms import IPPoolForm, VlanForm
 from django.shortcuts import get_object_or_404
 from requestflow.models import AssignedIP
+from django.contrib import messages
 
 class NewIpPoolView(CreateView):
     model = IPPoolModel
     form_class = IPPoolForm
    
     template_name = 'ipm/new_ippool.html'  # Template for creating a new IP pool
-    success_url = reverse_lazy('ip_pool_list')  # Redirect after successful creation
+    success_url = reverse_lazy('ipm:ippoollist')
+
 
 
 class IppoolListView(ListView):
@@ -28,13 +30,13 @@ class EditIPPoolView(UpdateView):
         'gateway', 'dns_servers', 'description', 'is_active'
     ]
     template_name = 'ipm/edit_ippool.html'
-    success_url = reverse_lazy('ipm:listippool')  # Adjust to your actual list view name
+    success_url = reverse_lazy('ipm:ippoollist')  # Redirect to pool list
 
 
 class DeleteIPPoolView(DeleteView):
     model = IPPoolModel
     template_name = 'ipm/delete_ippool.html'
-    success_url = reverse_lazy('ipm:listippool')
+    success_url = reverse_lazy('ipm:ippoollist')
 
     def delete(self, request, *args, **kwargs):
         messages.success(request, "✅ IP Pool deleted successfully.")
@@ -62,7 +64,7 @@ class NewVlanView(CreateView):
     model = VlanModel
     form_class = VlanForm
     template_name = 'ipm/new_vlan.html'  # Template for creating a new IP pool
-    success_url = reverse_lazy('vlan_list')  # Redirect after successful creation
+    success_url = reverse_lazy('ipm:listvlan')  # Redirect after successful creation
 
 
 class ListVlanView(ListView):

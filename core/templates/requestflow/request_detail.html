@@ -1,41 +1,105 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="container mt-4">
-  <h4>Request #{{ request.id }} – {{ request.user.email }}</h4>
-  <p><strong>Status:</strong> {{ request.get_status_display }}</p>
-  <p><strong>VLAN:</strong> {{ request.vlan.name }}</p>
-  <p><strong>Reason:</strong> {{ request.reason }}</p>
-  <p><strong>Duration:</strong> {{ request.duration_days }} days</p>
-  <p><strong>Admin Comment:</strong> {{ request.admin_comment }}</p>
+<div class="grid grid-cols-12 gap-x-6">
+  <div class="col-span-12 xl:col-span-8 md:col-span-6">
+    <div class="mt-5">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h4>Request #{{ request.id }} — {{ request.user.email }}</h4>
+          <span class="badge {% if request.status == 'approved' %}bg-success{% elif request.status == 'rejected' %}bg-danger{% else %}bg-warning text-dark{% endif %}">
+            {% if request.status == 'approved' %}✅{% elif request.status == 'rejected' %}❌{% else %}⏳{% endif %}
+            {{ request.get_status_display }}
+          </span>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <tbody>
+                <tr>
+                  <td><strong>VLAN</strong></td>
+                  <td>{{ request.vlan.name }}</td>
+                </tr>
+                <tr>
+                  <td><strong>IP Count</strong></td>
+                  <td>{{ request.ip_count }}</td>
+                </tr>
+                <tr>
+                  <td><strong>Duration</strong></td>
+                  <td>{{ request.duration_days }} days ({{ request.days_remaining }} days remaining)</td>
+                </tr>
+                <tr>
+                  <td><strong>Reason</strong></td>
+                  <td>{{ request.reason }}</td>
+                </tr>
+                <tr>
+                  <td><strong>Admin Comment</strong></td>
+                  <td>{{ request.admin_comment|default:'—' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
-  {% if request.status == 'approved' %}
-    <h5 class="mt-4">Assigned IPs</h5>
-    {% if request.assigned_ips.all %}
-      <table class="table table-bordered">
-        <thead>
-          <tr>
-            <th>IP Address</th>
-            <th>Monitored</th>
-            <th>Assigned By Admin</th>
-            <th>Created</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for ip in request.assigned_ips.all %}
-          <tr>
-            <td>{{ ip.ip_address }}</td>
-            <td>{% if ip.is_monitored %}✅{% else %}❌{% endif %}</td>
-            <td>{% if ip.assigned_by_admin %}✅{% else %}❌{% endif %}</td>
-            <td>{{ ip.created_at|date:"Y-m-d H:i" }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    {% else %}
-      <p>No IPs assigned yet.</p>
-    {% endif %}
-  {% else %}
-    <p>This request has not been approved yet.</p>
-  {% endif %}
+          <hr/>
+
+          <h5 class="mt-3">Assigned IPs ({{ request.assigned_ips.count }})</h5>
+          {% if request.status == 'approved' and request.assigned_ips.all %}
+            <form method="post">
+              {% csrf_token %}
+              <div class="table-responsive">
+                <table class="table table-hover">
+                  <thead>
+                    <tr>
+                      <th>IP Address</th>
+                      <th>Monitored</th>
+                      <th>Assigned By Admin</th>
+                      <th>Created</th>
+                      <th>Comment</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for ip in request.assigned_ips.all %}
+                      <tr>
+                        <td>{{ ip.ip_address }}</td>
+                        <td>{{ ip.is_monitored|yesno:"✅,❌" }}</td>
+                        <td>{{ ip.assigned_by_admin|yesno:"✅,❌" }}</td>
+                        <td>{{ ip.created_at|date:"Y-m-d H:i" }}</td>
+                        <td>
+                          <textarea name="desc_{{ ip.id }}" class="form-control" rows="2" placeholder="Add a comment...">{{ ip.description }}</textarea>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              {% if user.is_staff or user == request.user %}
+                <button type="submit" class="btn btn-primary">Save Comments</button>
+              {% endif %}
+            </form>
+          {% elif request.status == 'approved' %}
+            <p>No IPs assigned yet.</p>
+          {% else %}
+            <p>This request has not been approved yet.</p>
+          {% endif %}
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-span-12 xl:col-span-4">
+    <div class="mt-3">
+      <div class="card">
+        <div class="card-header">
+          <h5>Actions</h5>
+        </div>
+        <div class="card-body">
+          <a href="{% url 'requestflow:my_requests' %}" class="btn btn-outline-primary w-100 mb-2">Back to My Requests</a>
+          {% if request.status == 'pending' and request.user == user %}
+            <a href="#" class="btn btn-outline-danger w-100 disabled">Cancel (not implemented)</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

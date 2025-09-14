@@ -2,7 +2,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from ipaddress import ip_address
 from .models import IPRequest
-from ipm.models import IPPoolModel
+from ipm.models import IPPoolModel,VlanModel
 
 class IPRequestForm(forms.ModelForm):
     class Meta:
@@ -14,6 +14,16 @@ class IPRequestForm(forms.ModelForm):
             'reason': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'duration_days': forms.NumberInput(attrs={'class': 'form-control'}),
         }
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Show only VLANs visible to users (and active)
+        self.fields['vlan'].queryset = VlanModel.objects.filter(
+            is_visible_to_users=True,
+            status=True,
+        )
+
+
+       
 
     def clean(self):
         cleaned_data = super().clean()
@@ -37,6 +47,21 @@ class AdminReviewForm(forms.ModelForm):
             'admin_comment': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'selected_ippool': forms.Select(attrs={'class': 'form-select'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Get the current IPRequest instance
+        ip_request = self.instance
+
+        if ip_request and ip_request.vlan:
+            self.fields['selected_ippool'].queryset = IPPoolModel.objects.filter(
+                is_active=True,
+                vlan=ip_request.vlan
+            )
+        else:
+            # Fallback: show no pools if VLAN is missing
+            self.fields['selected_ippool'].queryset = IPPoolModel.objects.none()
 
     def clean(self):
         cleaned_data = super().clean()
