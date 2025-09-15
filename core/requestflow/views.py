@@ -12,15 +12,15 @@ from django.db.models import Count, Q
 
 
 
-class AdminReviewView(UserPassesTestMixin, UpdateView):
+class AdminReviewView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = IPRequest
     form_class = AdminReviewForm
     template_name = 'requestflow/new_request.html'  # Reuse the new request template layout
     success_url = reverse_lazy('requestflow:admin_requests')
 
     def test_func(self):
-        # Only allow users with is_staff or is_superuser privileges
-        return self.request.user.is_staff or self.request.user.is_superuser
+        # Only superusers can review requests
+        return self.request.user.is_superuser
 
     def form_valid(self, form):
         ip_request = form.instance
@@ -61,6 +61,7 @@ class MyRequestListView(LoginRequiredMixin, ListView):
     model = IPRequest
     template_name = 'requestflow/my_requests.html'
     context_object_name = 'requests'
+    paginate_by = 10
 
     def get_queryset(self):
         qs = IPRequest.objects.filter(user=self.request.user).order_by('-created_at')
@@ -106,14 +107,14 @@ class MyRequestListView(LoginRequiredMixin, ListView):
 
 
 
-class AdminRequestListView(UserPassesTestMixin, ListView):
+class AdminRequestListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = IPRequest
     template_name = 'requestflow/admin_requests.html'
     context_object_name = 'requests'
     paginate_by = 10  # Show 10 requests per page
 
     def test_func(self):
-        return self.request.user.is_staff
+        return self.request.user.is_superuser
 
     def get_queryset(self):
         status_filter = self.request.GET.get('status', 'pending')  # Default to 'pending'
@@ -145,17 +146,22 @@ class AdminRequestListView(UserPassesTestMixin, ListView):
 
 
    
-class RequestDetailView(LoginRequiredMixin, DetailView):
+class RequestDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     model = IPRequest
     template_name = 'requestflow/request_detail.html'
-    context_object_name = 'request'
+    context_object_name = 'ip_request'
+
+    def test_func(self):
+        obj = self.get_object()
+        # Only allow the creator of the request to view
+        return self.request.user == obj.user
+
+    def handle_no_permission(self):
+        messages.error(self.request, "You are not allowed to view that request.")
+        return redirect('requestflow:my_requests')
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        # Only the request owner or staff can update comments
-        if not (request.user.is_staff or request.user == self.object.user):
-            messages.error(request, "You are not allowed to update comments for this request.")
-            return redirect('requestflow:request_detail', pk=self.object.pk)
 
         updated = 0
         for ip in self.object.assigned_ips.all():

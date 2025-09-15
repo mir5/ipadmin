@@ -5,10 +5,10 @@
     <div class="mt-5">
       <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
-          <h4>Request #{{ request.id }} — {{ request.user.email }}</h4>
-          <span class="badge {% if request.status == 'approved' %}bg-success{% elif request.status == 'rejected' %}bg-danger{% else %}bg-warning text-dark{% endif %}">
-            {% if request.status == 'approved' %}✅{% elif request.status == 'rejected' %}❌{% else %}⏳{% endif %}
-            {{ request.get_status_display }}
+          <h4>Request #{{ ip_request.id }} — {{ ip_request.user.email }}</h4>
+          <span class="badge {% if ip_request.status == 'approved' %}bg-success{% elif ip_request.status == 'rejected' %}bg-danger{% else %}bg-warning text-dark{% endif %}">
+            {% if ip_request.status == 'approved' %}✅{% elif ip_request.status == 'rejected' %}❌{% else %}⏳{% endif %}
+            {{ ip_request.get_status_display }}
           </span>
         </div>
         <div class="card-body">
@@ -17,23 +17,23 @@
               <tbody>
                 <tr>
                   <td><strong>VLAN</strong></td>
-                  <td>{{ request.vlan.name }}</td>
+                  <td>{{ ip_request.vlan.name }}</td>
                 </tr>
                 <tr>
                   <td><strong>IP Count</strong></td>
-                  <td>{{ request.ip_count }}</td>
+                  <td>{{ ip_request.ip_count }}</td>
                 </tr>
                 <tr>
                   <td><strong>Duration</strong></td>
-                  <td>{{ request.duration_days }} days ({{ request.days_remaining }} days remaining)</td>
+                  <td>{{ ip_request.duration_days }} days ({{ ip_request.days_remaining }} days remaining)</td>
                 </tr>
                 <tr>
                   <td><strong>Reason</strong></td>
-                  <td>{{ request.reason }}</td>
+                  <td>{{ ip_request.reason }}</td>
                 </tr>
                 <tr>
                   <td><strong>Admin Comment</strong></td>
-                  <td>{{ request.admin_comment|default:'—' }}</td>
+                  <td>{{ ip_request.admin_comment|default:'—' }}</td>
                 </tr>
               </tbody>
             </table>
@@ -41,8 +41,8 @@
 
           <hr/>
 
-          <h5 class="mt-3">Assigned IPs ({{ request.assigned_ips.count }})</h5>
-          {% if request.status == 'approved' and request.assigned_ips.all %}
+          <h5 class="mt-3">Assigned IPs ({{ ip_request.assigned_ips.count }})</h5>
+          {% if ip_request.status == 'approved' and ip_request.assigned_ips.all %}
             <form method="post">
               {% csrf_token %}
               <div class="table-responsive">
@@ -57,7 +57,7 @@
                     </tr>
                   </thead>
                   <tbody>
-                    {% for ip in request.assigned_ips.all %}
+                    {% for ip in ip_request.assigned_ips.all %}
                       <tr>
                         <td>{{ ip.ip_address }}</td>
                         <td>{{ ip.is_monitored|yesno:"✅,❌" }}</td>
@@ -71,11 +71,11 @@
                   </tbody>
                 </table>
               </div>
-              {% if user.is_staff or user == request.user %}
+              {% if user.is_staff or user == ip_request.user %}
                 <button type="submit" class="btn btn-primary">Save Comments</button>
               {% endif %}
             </form>
-          {% elif request.status == 'approved' %}
+          {% elif ip_request.status == 'approved' %}
             <p>No IPs assigned yet.</p>
           {% else %}
             <p>This request has not been approved yet.</p>
@@ -94,7 +94,7 @@
         </div>
         <div class="card-body">
           <a href="{% url 'requestflow:my_requests' %}" class="btn btn-outline-primary w-100 mb-2">Back to My Requests</a>
-          {% if request.status == 'pending' and request.user == user %}
+          {% if ip_request.status == 'pending' and ip_request.user == user %}
             <a href="#" class="btn btn-outline-danger w-100 disabled">Cancel (not implemented)</a>
           {% endif %}
         </div>

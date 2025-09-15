@@ -7,6 +7,7 @@
 
         <!-- [ Main Content ] start -->
         <div class="grid grid-cols-12 gap-x-6">
+          {% if request.user.is_superuser %}
           <div class="col-span-12 xl:col-span-4 md:col-span-6">
             <div class="card">
               <div class="card-header !pb-0 !border-b-0">
@@ -67,6 +68,7 @@
               </div>
             </div>
           </div>
+          {% endif %}
           <div class="col-span-12 xl:col-span-4">
             <div class="card card-social">
               <div class="card-body border-b border-theme-border dark:border-themedark-border">
@@ -194,7 +196,7 @@
                     <thead>
                       <tr>
                         <th>ID</th>
-                        <th>User</th>
+                        {% if request.user.is_superuser %}<th>User</th>{% endif %}
                         <th>VLAN</th>
                         <th>IPs</th>
                         <th>Status</th>
@@ -205,7 +207,7 @@
                       {% for req in latest_requests %}
                         <tr>
                           <td>{{ req.id }}</td>
-                          <td>{{ req.user.email }}</td>
+                          {% if request.user.is_superuser %}<td>{{ req.user.email }}</td>{% endif %}
                           <td>{{ req.vlan.name }}</td>
                           <td>{{ req.ip_count }}</td>
                           <td>{{ req.get_status_display }}</td>

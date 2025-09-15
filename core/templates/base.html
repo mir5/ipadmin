@@ -82,6 +82,7 @@
           <i data-feather="feather"></i>
         </li>
 
+        {% if request.user.is_superuser %}
            <li class="pc-item pc-hasmenu">
           <a href="{% url 'ipm:listvlan' %}" class="pc-link">
             <span class="pc-micon"> <i data-feather="globe"></i></span>
@@ -101,6 +102,7 @@
             <span class="pc-mtext">IP Management</span>
           </a>
         </li>
+        {% endif %}
 
         
         <li class="pc-item pc-caption">
@@ -119,30 +121,34 @@
             <span class="pc-mtext">My Reqeust</span>
           </a>
         </li>
-        <li class="pc-item pc-hasmenu">
-          <a href="{% url 'requestflow:admin_requests' %}" class="pc-link" >
-            <span class="pc-micon"> <i data-feather="clipboard"></i></span>
-            <span class="pc-mtext">Request Managment</span>
-          </a>
-        </li>
+        {% if request.user.is_superuser %}
+          <li class="pc-item pc-hasmenu">
+            <a href="{% url 'requestflow:admin_requests' %}" class="pc-link" >
+              <span class="pc-micon"> <i data-feather="clipboard"></i></span>
+              <span class="pc-mtext">Request Managment</span>
+            </a>
+          </li>
+        {% endif %}
         
 
+{% if request.user.is_superuser %}
         <li class="pc-item pc-caption">
           <label>Users</label>
           <i data-feather="monitor"></i>
         </li>
         <li class="pc-item pc-hasmenu">
-          <a href="../pages/login-v1.html" class="pc-link" >
+          <a href="{% url 'accounts:user_list' %}" class="pc-link" >
             <span class="pc-micon"> <i data-feather="user"></i></span>
             <span class="pc-mtext">User List</span>
           </a>
         </li>
         <li class="pc-item pc-hasmenu">
-          <a href="../pages/register-v1.html" class="pc-link" >
+          <a href="{% url 'accounts:user_create' %}" class="pc-link" >
             <span class="pc-micon"> <i data-feather="user-plus"></i></span>
             <span class="pc-mtext">New User</span>
           </a>
         </li>
+        {% endif %}
         
       </ul>
     </div>
@@ -202,19 +208,19 @@
       </div>
     </li>
     
-    <li class="dropdown pc-h-item">
-      <a class="pc-head-link dropdown-toggle me-0" data-pc-toggle="dropdown" href="#" role="button"
-        aria-haspopup="false" aria-expanded="false">
-        <i data-feather="bell"></i>
-        <span class="ml-1 hidden sm:inline">Notifications</span>
-        <span class="badge bg-success-500 text-white rounded-full z-10 absolute right-0 top-0">{{ pending_requests_count }}</span>
-      </a>
-      <div class="dropdown-menu dropdown-notification dropdown-menu-end pc-h-dropdown p-2">
-        <div class="dropdown-header flex items-center justify-between py-4 px-5">
-          <h5 class="m-0">Pending Requests</h5>
-        </div>
-        <div class="dropdown-body header-notification-scroll relative py-2 px-3" style="max-height: calc(100vh - 215px)">
-          {% if request.user.is_staff %}
+    {% if request.user.is_superuser %}
+      <li class="dropdown pc-h-item">
+        <a class="pc-head-link dropdown-toggle me-0" data-pc-toggle="dropdown" href="#" role="button"
+          aria-haspopup="false" aria-expanded="false">
+          <i data-feather="bell"></i>
+          <span class="ml-1 hidden sm:inline">Notifications</span>
+          <span class="badge bg-success-500 text-white rounded-full z-10 absolute right-0 top-0">{{ pending_requests_count }}</span>
+        </a>
+        <div class="dropdown-menu dropdown-notification dropdown-menu-end pc-h-dropdown p-2">
+          <div class="dropdown-header flex items-center justify-between py-4 px-5">
+            <h5 class="m-0">Pending Requests</h5>
+          </div>
+          <div class="dropdown-body header-notification-scroll relative py-2 px-3" style="max-height: calc(100vh - 215px)">
             {% if pending_requests_count %}
               {% for req in pending_requests %}
                 <a href="{% url 'requestflow:admin_review' req.id %}" class="dropdown-item flex items-center justify-between">
@@ -225,12 +231,10 @@
             {% else %}
               <span class="dropdown-item-text text-muted">No pending requests.</span>
             {% endif %}
-          {% else %}
-            <span class="dropdown-item-text text-muted">No notifications.</span>
-          {% endif %}
+          </div>
         </div>
-      </div>
-    </li>
+      </li>
+    {% endif %}
     <li class="dropdown pc-h-item header-user-profile">
       <a class="pc-head-link dropdown-toggle arrow-none me-0" data-pc-toggle="dropdown" href="#" role="button"
         aria-haspopup="false" data-pc-auto-close="outside" aria-expanded="false">
@@ -259,13 +263,24 @@
                   <span>Change Password</span>
                 </span>
               </a>
-              <div class="grid my-3">
-                <a href="{% url 'accounts:logout' %}" class="btn btn-primary flex items-center justify-center">
-                  <svg class="pc-icon me-2 w-[22px] h-[22px]">
-                    <use xlink:href="#custom-logout-1-outline"></use>
+              <a href="{% url 'accounts:profile' %}" class="dropdown-item">
+                <span>
+                  <svg class="pc-icon text-muted me-2 inline-block">
+                    <use xlink:href="#custom-user"></use>
                   </svg>
-                  Logout
-                </a>
+                  <span>Profile</span>
+                </span>
+              </a>
+              <div class="grid my-3">
+                <form method="post" action="{% url 'accounts:logout' %}">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-primary flex items-center justify-center w-full">
+                    <svg class="pc-icon me-2 w-[22px] h-[22px]">
+                      <use xlink:href="#custom-logout-1-outline"></use>
+                    </svg>
+                    Logout
+                  </button>
+                </form>
               </div>
             </div>
           </div>
@@ -304,12 +319,9 @@
         <div class="grid grid-cols-12 gap-1.5">
           <div class="col-span-12 sm:col-span-6 my-1">
             <p class="m-0"></p>
-              <a href="https://codedthemes.com/" class="text-theme-bodycolor dark:text-themedark-bodycolor hover:text-primary-500 dark:hover:text-primary-500" >CodedThemes</a>
-              , Built with ♥ for a smoother web presence.
-            </p>
           </div>
           <div class="col-span-12 sm:col-span-6 my-1 justify-self-end">
-                   <p class="inline-block max-sm:mr-3 sm:ml-2">Distributed by <a href="https://themewagon.com" >Themewagon</a></p>
+            <p class="inline-block max-sm:mr-3 sm:ml-2"></p>
           </div>
         </div>
       </div>

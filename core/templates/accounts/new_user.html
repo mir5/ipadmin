@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-header flex items-center justify-between">
+      <h5 class="m-0">Create New User</h5>
+      <a class="btn btn-outline-primary" href="{% url 'accounts:user_list' %}">Back to list</a>
+    </div>
+    <div class="card-body">
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+        {% endif %}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label>Email</label>
+            {{ form.email }}
+            {{ form.email.errors }}
+          </div>
+          <div>
+            <label>Is Staff</label>
+            {{ form.is_staff }}
+            {{ form.is_staff.errors }}
+          </div>
+          <div>
+            <label>Password</label>
+            {{ form.password1 }}
+            {{ form.password1.errors }}
+          </div>
+          <div>
+            <label>Confirm Password</label>
+            {{ form.password2 }}
+            {{ form.password2.errors }}
+          </div>
+          <div>
+            <label>First Name</label>
+            {{ form.first_name }}
+            {{ form.first_name.errors }}
+          </div>
+          <div>
+            <label>Last Name</label>
+            {{ form.last_name }}
+            {{ form.last_name.errors }}
+          </div>
+          <div>
+            <label>Department</label>
+            {{ form.department }}
+            {{ form.department.errors }}
+          </div>
+          <div>
+            <label>Phone Number</label>
+            {{ form.phone_number }}
+            {{ form.phone_number.errors }}
+          </div>
+        </div>
+        <div class="mt-4">
+          <button type="submit" class="btn btn-primary">Create User</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

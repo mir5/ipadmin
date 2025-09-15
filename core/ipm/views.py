@@ -1,5 +1,6 @@
 # views.py
 from django.views.generic import CreateView, ListView, DetailView, UpdateView, DeleteView
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
 from .models import IPPoolModel, VlanModel
 from .forms import IPPoolForm, VlanForm
@@ -7,23 +8,27 @@ from django.shortcuts import get_object_or_404
 from requestflow.models import AssignedIP
 from django.contrib import messages
 
-class NewIpPoolView(CreateView):
+class NewIpPoolView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = IPPoolModel
     form_class = IPPoolForm
    
     template_name = 'ipm/new_ippool.html'  # Template for creating a new IP pool
     success_url = reverse_lazy('ipm:ippoollist')
+    def test_func(self):
+        return self.request.user.is_superuser
 
 
 
-class IppoolListView(ListView):
+class IppoolListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = IPPoolModel
     paginate_by = 10  # Number of IP pools per page
     template_name = 'ipm/list_ippool.html'  # Template for listing IP pools
     context_object_name = 'ip_pools'
+    def test_func(self):
+        return self.request.user.is_superuser
 
 
-class EditIPPoolView(UpdateView):
+class EditIPPoolView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = IPPoolModel
     fields = [
         'vlan', 'ip_range_start', 'ip_range_end', 'subnet_mask',
@@ -31,22 +36,28 @@ class EditIPPoolView(UpdateView):
     ]
     template_name = 'ipm/edit_ippool.html'
     success_url = reverse_lazy('ipm:ippoollist')  # Redirect to pool list
+    def test_func(self):
+        return self.request.user.is_superuser
 
 
-class DeleteIPPoolView(DeleteView):
+class DeleteIPPoolView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = IPPoolModel
     template_name = 'ipm/delete_ippool.html'
     success_url = reverse_lazy('ipm:ippoollist')
+    def test_func(self):
+        return self.request.user.is_superuser
 
     def delete(self, request, *args, **kwargs):
         messages.success(request, "✅ IP Pool deleted successfully.")
         return super().delete(request, *args, **kwargs)
 
 
-class DetailIPpoolView(DetailView):
+class DetailIPpoolView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     model = IPPoolModel
     template_name = 'ipm/ippool_detail.html'
     context_object_name = 'pool'
+    def test_func(self):
+        return self.request.user.is_superuser
 
     def get_object(self):
         pool_id = self.kwargs.get('pk')
@@ -60,18 +71,22 @@ class DetailIPpoolView(DetailView):
         return context
 
 
-class NewVlanView(CreateView):
+class NewVlanView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = VlanModel
     form_class = VlanForm
     template_name = 'ipm/new_vlan.html'  # Template for creating a new IP pool
     success_url = reverse_lazy('ipm:listvlan')  # Redirect after successful creation
+    def test_func(self):
+        return self.request.user.is_superuser
 
 
-class ListVlanView(ListView):
+class ListVlanView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = VlanModel
     paginate_by = 10
     template_name = 'ipm/list_vlan.html'
     context_object_name = 'vlans'
+    def test_func(self):
+        return self.request.user.is_superuser
 
     def get_queryset(self):
         queryset = VlanModel.objects.all().order_by('-id')  # Or any field you prefer
@@ -103,15 +118,19 @@ class ListVlanView(ListView):
         return context
 
     
-class EditVlanView(UpdateView):
+class EditVlanView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = VlanModel
     fields = ['name', 'vlan_id', 'category', 'vpn_name','description', 'is_visible_to_users', 'status']
     template_name = 'ipm/edit_vlan.html'
     success_url = reverse_lazy('ipm:listvlan')  # Redirect after successful edit
+    def test_func(self):
+        return self.request.user.is_superuser
 
 
-class DeleteVlanView(DeleteView):
+class DeleteVlanView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = VlanModel
     template_name = 'ipm/delete_vlan.html'
     success_url = reverse_lazy('ipm:listvlan')  # Redirect after deletion
+    def test_func(self):
+        return self.request.user.is_superuser
     
