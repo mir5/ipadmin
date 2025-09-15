@@ -3,6 +3,11 @@ IP Admin
 
 A Django-based IP address management (IPAM) and request workflow application that brings structure, visibility, and auditability to assigning IPv4 addresses across VLANs and pools.
 
+Project Status: MVP
+-------------------
+
+This is the initial MVP release. Core flows are implemented (accounts, requests/approvals, VLAN/IP pools, dashboard). More features and hardening are planned and will be deployed iteratively. See the Roadmap section and follow the repository for updates.
+
 Highlights
 ---------
 
@@ -151,4 +156,3 @@ Links
 
 - GitHub: https://github.com/your-org/ipadmin
 - Project docs: see `core/README.md`
-

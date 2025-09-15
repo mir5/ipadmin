@@ -3,6 +3,11 @@ IP Admin
 
 A Django-based IP management and request workflow application.
 
+Project Status: MVP
+-------------------
+
+This is the first MVP release of IP Admin. It covers the essential user and admin flows (requests, approvals, VLAN/IP pool management, and dashboard). Additional features, integrations, and production hardening will roll out in subsequent versions.
+
 Features
 --------
 
@@ -112,4 +117,3 @@ Troubleshooting
 - DB connection errors in Docker: confirm `db` service is healthy and the backend depends_on is satisfied.
 - Static not loading in prod: verify `collectstatic` ran and proxy serves from `STATIC_ROOT`.
 - Login issues: ensure email-based auth backend is active and templates use email fields.
-
