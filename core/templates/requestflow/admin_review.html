@@ -9,12 +9,215 @@
             <h4>Review Request #{{ object.id }}</h4>
     </div>
     <div class="card-body">
+        <!-- Requester Profile & History -->
+        <div class="row g-3 align-items-stretch mb-3">
+          <div class="col-12 col-sm-6 col-lg-6">
+            <div class="card h-100">
+              <div class="card-header"><h5 class="mb-0">Requester</h5></div>
+              <div class="card-body">
+                <div class="d-flex align-items-start">
+                  <img src="{{ profile.image.url|default_if_none:'' }}" alt="avatar" class="rounded me-3" style="width:64px;height:64px;object-fit:cover;" onerror="this.style.display='none'">
+                  <div>
+                    <div><strong>Name:</strong> {{ profile.get_fullname|default:requester.email }}</div>
+                    <div><strong>Email:</strong> {{ requester.email }}</div>
+                    <div><strong>Department:</strong> {{ profile.department|default:'—' }}</div>
+                    <div><strong>Phone:</strong> {{ profile.phone_number|default:'—' }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-sm-6 col-lg-6">
+            <div class="card h-100">
+              <div class="card-header"><h5 class="mb-0">Request History</h5></div>
+              <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>Requested On</span>
+                    <span class="text-muted">{{ object.created_at|date:"Y-m-d H:i" }}</span>
+                  </li>
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>Requested IPs</span>
+                    <span class="badge bg-info text-dark">{{ object.ip_count }}</span>
+                  </li>
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>Assigned (this request)</span>
+                    <span class="badge bg-primary">{{ object.assigned_ips.count }}</span>
+                  </li>
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>Assigned to user (all)</span>
+                    <span class="badge bg-secondary">{{ user_assigned_total }}</span>
+                  </li>
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>Total</span>
+                    <span class="badge bg-secondary">{{ request_stats.total }}</span>
+                  </li>
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>Approved</span>
+                    <span class="badge bg-success">{{ request_stats.approved }}</span>
+                  </li>
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>Rejected</span>
+                    <span class="badge bg-danger">{{ request_stats.rejected }}</span>
+                  </li>
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>Pending</span>
+                    <span class="badge bg-warning text-dark">{{ request_stats.pending }}</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <form method="post">
           {% csrf_token %}
-          {{ form.as_p }}
-          <button type="submit" class="btn btn-success">Submit Review</button>
+          {{ form.non_field_errors }}
+
+          <div class="mb-3">
+            <label for="id_status" class="form-label">Status</label>
+            {{ form.status }}
+            {{ form.status.errors }}
+          </div>
+
+          <div class="mb-3">
+            <label for="id_selected_ippool" class="form-label">Selected IP Pool</label>
+            {{ form.selected_ippool }}
+            {{ form.selected_ippool.errors }}
+          </div>
+
+          <div id="pool-stats-card" class="card mt-2 d-none">
+            <div class="card-body py-2">
+              <small id="pool-stats-text" class="text-muted"></small>
+            </div>
+          </div>
+          <div id="pool-error" class="alert alert-danger mt-2 d-none"></div>
+
+          <div id="manual-toggle" class="form-check mt-3" style="display:none;">
+            {{ form.manual_assign }}
+            <label class="form-check-label" for="id_manual_assign">Manual IP assignment</label>
+            <div id="manual-pool-summary" class="form-text text-muted" style="display:none;"></div>
+          </div>
+
+          <div id="manual-fields" class="row g-3 mt-1" style="display:none;">
+            <div class="col-sm-6">
+              <label for="id_manual_start_ip" class="form-label">Start IP</label>
+              {{ form.manual_start_ip }}
+              {{ form.manual_start_ip.errors }}
+            </div>
+            <div class="col-sm-6">
+              <label for="id_manual_end_ip" class="form-label">End IP</label>
+              {{ form.manual_end_ip }}
+              {{ form.manual_end_ip.errors }}
+            </div>
+            <div class="col-12">
+              <small class="text-muted">Range size must equal requested count ({{ object.ip_count }}).</small>
+            </div>
+          </div>
+
+          <div class="mb-3 mt-3">
+            <label for="id_admin_comment" class="form-label">Admin Comment</label>
+            {{ form.admin_comment }}
+            {{ form.admin_comment.errors }}
+          </div>
+
+          <button id="submit-btn" type="submit" class="btn btn-success mt-2">Submit Review</button>
           
         </form>
+        <script>
+          (function() {
+            const poolSelect = document.getElementById('id_selected_ippool');
+            const statsCard = document.getElementById('pool-stats-card');
+            const statsText = document.getElementById('pool-stats-text');
+            const errorEl = document.getElementById('pool-error');
+            const submitBtn = document.getElementById('submit-btn');
+            const manualToggle = document.getElementById('manual-toggle');
+            const manualCheckbox = document.getElementById('id_manual_assign');
+            const manualFields = document.getElementById('manual-fields');
+            const manualSummary = document.getElementById('manual-pool-summary');
+
+            function show(el, display='block'){ if(el){ el.style.display = display; } }
+            function hide(el){ if(el){ el.style.display = 'none'; } }
+
+            async function updateStats() {
+              const poolId = poolSelect ? poolSelect.value : '';
+              if (!poolId) {
+                statsText.textContent = '';
+                statsCard.classList.add('d-none');
+                errorEl.textContent = '';
+                errorEl.classList.add('d-none');
+                submitBtn.removeAttribute('disabled');
+                hide(manualToggle);
+                hide(manualFields);
+                hide(manualSummary);
+                if (manualCheckbox) manualCheckbox.checked = false;
+                return;
+              }
+              try {
+                const url = "{% url 'requestflow:pool_stats' object.id %}?pool=" + encodeURIComponent(poolId);
+                const res = await fetch(url, { credentials: 'same-origin' });
+                if (!res.ok) throw new Error('Failed to load pool stats');
+                const data = await res.json();
+                statsText.textContent = `Pool stats — Total: ${data.total}, Used: ${data.used}, Free: ${data.free}. Required: ${data.required}.`;
+                statsCard.classList.remove('d-none');
+                if (data.enough) {
+                  errorEl.textContent = '';
+                  errorEl.classList.add('d-none');
+                  submitBtn.removeAttribute('disabled');
+                  show(manualToggle);
+                  if (manualCheckbox && manualCheckbox.checked) {
+                    show(manualFields);
+                  } else {
+                    hide(manualFields);
+                  }
+                  // Update summary under manual checkbox
+                  if (manualSummary) {
+                    let rangeText = '';
+                    if (data.used_first && data.used_last) {
+                      rangeText = ` Used range: ${data.used_first} → ${data.used_last}.`;
+                    }
+                    manualSummary.textContent = `Pool usage: Used ${data.used} of Total ${data.total} (Free ${data.free}). Required ${data.required}.` + rangeText;
+                    show(manualSummary, 'block');
+                  }
+                } else {
+                  errorEl.textContent = `Not enough free IPs in the selected pool. Required: ${data.required}, Free: ${data.free}.`;
+                  errorEl.classList.remove('d-none');
+                  hide(manualToggle);
+                  hide(manualFields);
+                  hide(manualSummary);
+                  if (manualCheckbox) manualCheckbox.checked = false;
+                  // Keep submit enabled to allow reject/save comment; server-side blocks inadequate approval
+                }
+              } catch (e) {
+                statsText.textContent = '';
+                statsCard.classList.add('d-none');
+                errorEl.textContent = 'Could not load IP pool stats.';
+                errorEl.classList.remove('d-none');
+                hide(manualToggle);
+                hide(manualFields);
+                hide(manualSummary);
+                if (manualCheckbox) manualCheckbox.checked = false;
+                // Do not disable submit; admin may change selection or reject
+              }
+            }
+
+            if (poolSelect) {
+              poolSelect.addEventListener('change', updateStats);
+              // Initialize on load if there is a selected value
+              if (poolSelect.value) updateStats();
+            }
+
+            if (manualCheckbox) {
+              manualCheckbox.addEventListener('change', function() {
+                if (manualCheckbox.checked) {
+                  show(manualFields);
+                } else {
+                  hide(manualFields);
+                }
+              });
+            }
+          })();
+        </script>
 </div>
 </div>
 {% endblock %}

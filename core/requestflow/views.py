@@ -1,13 +1,15 @@
 from django.views.generic import CreateView, ListView, DetailView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.contrib import messages
 from .models import IPRequest, AssignedIP
 from .forms import IPRequestForm, AdminReviewForm
 from django.db import transaction
 import ipaddress
 from django.db.models import Count, Q
+from django.http import JsonResponse, HttpResponseForbidden
+from ipm.models import IPPoolModel
 
 
 
@@ -15,7 +17,7 @@ from django.db.models import Count, Q
 class AdminReviewView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = IPRequest
     form_class = AdminReviewForm
-    template_name = 'requestflow/new_request.html'  # Reuse the new request template layout
+    template_name = 'requestflow/admin_review.html'
     success_url = reverse_lazy('requestflow:admin_requests')
 
     def test_func(self):
@@ -32,7 +34,51 @@ class AdminReviewView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         if ip_request.status == 'approved':
             try:
                 with transaction.atomic():
-                    ip_request.assign_ips()
+                    # Manual or automatic assignment
+                    manual = form.cleaned_data.get('manual_assign')
+                    if manual:
+                        start_ip = form.cleaned_data.get('manual_start_ip')
+                        end_ip = form.cleaned_data.get('manual_end_ip')
+                        pool = form.cleaned_data.get('selected_ippool')
+
+                        # Generate range and assign
+                        s = ipaddress.IPv4Address(start_ip)
+                        e = ipaddress.IPv4Address(end_ip)
+
+                        # Additional safety checks (should be covered in form.clean())
+                        p_start = ipaddress.IPv4Address(pool.ip_range_start)
+                        p_end = ipaddress.IPv4Address(pool.ip_range_end)
+                        if not (p_start <= s <= p_end and p_start <= e <= p_end and s <= e):
+                            raise ValueError("Invalid manual IP range.")
+
+                        # Check for conflicts within VLAN
+                        existing_ips = set(
+                            AssignedIP.objects.filter(ip_request__selected_ippool__vlan=pool.vlan)
+                            .values_list('ip_address', flat=True)
+                        )
+
+                        # Ensure range size equals requested ip_count
+                        required = int(ip_request.ip_count or 0)
+                        selected_count = int(e) - int(s) + 1
+                        if selected_count != required:
+                            raise ValueError("Manual range size must equal requested IP count.")
+
+                        current = int(s)
+                        created = 0
+                        while current <= int(e):
+                            ip_str = str(ipaddress.IPv4Address(current))
+                            if ip_str in existing_ips:
+                                raise ValueError(f"IP {ip_str} is already assigned.")
+                            AssignedIP.objects.create(
+                                ip_request=ip_request,
+                                user=ip_request.user,
+                                ip_address=ip_str,
+                                assigned_by_admin=True,
+                            )
+                            created += 1
+                            current += 1
+                    else:
+                        ip_request.assign_ips()
                     messages.success(self.request, "Request approved and IPs assigned successfully.")
                     return super().form_valid(form)
             except ValueError as e:
@@ -44,6 +90,24 @@ class AdminReviewView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         # If status is still pending or invalid
         messages.warning(self.request, "No action taken. Please select approve or reject.")
         return super().form_invalid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        ip_request = self.object
+        user = ip_request.user
+        qs = IPRequest.objects.filter(user=user)
+        context.update({
+            'requester': user,
+            'profile': getattr(user, 'user_profile', None),
+            'request_stats': {
+                'total': qs.count(),
+                'approved': qs.filter(status='approved').count(),
+                'rejected': qs.filter(status='rejected').count(),
+                'pending': qs.filter(status='pending').count(),
+            },
+            'user_assigned_total': AssignedIP.objects.filter(user=user).count(),
+        })
+        return context
 
 
 class IPRequestCreateView(LoginRequiredMixin, CreateView):
@@ -181,4 +245,56 @@ class RequestDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
         return redirect('requestflow:request_detail', pk=self.object.pk)
 
 
-    
+def pool_stats(request, pk):
+    """Return JSON with stats for a selected IP pool for the given request.
+
+    Response example:
+    {
+      "pool_id": 1,
+      "total": 50,
+      "used": 12,
+      "free": 38,
+      "required": 5,
+      "enough": true
+    }
+    """
+    if not request.user.is_authenticated or not request.user.is_superuser:
+        return HttpResponseForbidden()
+
+    ip_request = get_object_or_404(IPRequest, pk=pk)
+    pool_id = request.GET.get('pool')
+    try:
+        pool = IPPoolModel.objects.get(pk=pool_id, is_active=True)
+    except (IPPoolModel.DoesNotExist, ValueError, TypeError):
+        return JsonResponse({"detail": "Pool not found"}, status=404)
+
+    total = pool.total_ip_count
+    used = pool.assigned_ip_count
+    free = max(total - used, 0)
+    required = ip_request.ip_count or 0
+
+    # Determine first and last used IP within this pool (if any)
+    used_first = None
+    used_last = None
+    if used:
+        assigned_list = list(
+            AssignedIP.objects.filter(ip_request__selected_ippool=pool)
+            .values_list('ip_address', flat=True)
+        )
+        try:
+            ip_objs = [ipaddress.IPv4Address(ip) for ip in assigned_list]
+            used_first = str(min(ip_objs))
+            used_last = str(max(ip_objs))
+        except Exception:
+            used_first, used_last = None, None
+
+    return JsonResponse({
+        "pool_id": pool.id,
+        "total": total,
+        "used": used,
+        "free": free,
+        "required": required,
+        "enough": free >= required,
+        "used_first": used_first,
+        "used_last": used_last,
+    })
